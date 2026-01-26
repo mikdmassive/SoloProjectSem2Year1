@@ -59,15 +59,18 @@ body {
 
 #Logo,
 #logo-img {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
   padding-left: 10px;
   display: flex;
-  text-align: center;
+  max-height: 120px;
 
 }
 
 header,
 #Logo {
-  background-color: #0A437C;
+  background-color: #434343;
 }
 
 nav ul {
@@ -94,11 +97,11 @@ nav ul li a {
 
 nav ul li :hover {
   padding-left: 10px;
-  border-left: 1px solid #F28B30;
+  border-left: 1px solid #797979;
 }
 
 footer {
-  background-color: #0A437C;
+  background-color: #434343;
   color: #fff;
   border-top: 1px solid #ccc;
   margin: 20px 10px 10px 0;
@@ -165,34 +168,38 @@ footer {
 
 @keyframes buttonHoverEffect {
   from {
-    background-color: #F28B30;
+    background-color: #797979;
     width: 120px;
-    height: 30px;
+    height: 50px;
   }
 
   to {
-    background-color: #884a14;
+    background-color: #8b8b8b;
     width: 130px;
-    height: 35px;
+    height: 55px;
   }
 }
 
 button {
-  background-color: #F28B30;
+  background-color: #797979;
   border: 1px solid rgb(0, 0, 0);
   border-radius: 4px;
   box-shadow: 0 0 10px #242424;
   width: 120px;
-  height: 33px;
+  height: 50px;
   cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  color: #fff;
+  font-size: 20px;
 }
 
 button:hover {
   animation-name: buttonHoverEffect;
   animation-duration: .2s;
-  background-color: #884a14;
+  background-color: #8b8b8b;
   width: 130px;
-  height: 35px;
+  height: 55px;
 }
 
 
@@ -279,11 +286,19 @@ header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 10px solid #F28B30;
+  border-bottom: 10px solid #797979;
 }
 
 /* Burger Menu Styles */
 @media (max-width:950px) {
+
+  #Logo,
+  #logo-img {
+    text-align: left;
+    align-items: left;
+    justify-content: left;
+  }
+
   nav {
     max-height: 0px;
     overflow: hidden;
@@ -293,6 +308,18 @@ header {
   nav.active {
     max-height: 500px;
     overflow: visible;
+  }
+  #ProfileDiv{
+    max-height: 500px;
+    overflow: visible;
+  }
+  #ProfileDiv.active{
+    max-height: 0px;
+    overflow: hidden;
+  }
+  #ProfileDiv .InlineButtons
+  {
+    flex-direction: row;
   }
 
   .burger-menu {
@@ -354,7 +381,10 @@ header {
 
 /* -- DESKTOP --*/
 @media (min-width:950px) {
-  
+  nav {
+    padding-left: 10px;
+  }
+
   .InlineButtons {
     flex-direction: row;
   }
@@ -383,16 +413,15 @@ header {
     padding-left: 20px;
     padding-right: 20px;
     border: none;
-    border-top: 1px solid #7e8aa2;
-    ;
     border-left: 1px solid #7e8aa2;
+    font-size: 20px;
 
   }
 
   nav ul li :hover {
     border: none;
     padding-left: 0px;
-    border-bottom: 1px solid #F28B30;
+    border-bottom: 1px solid #797979;
   }
 
   nav li:last-child {
@@ -403,8 +432,9 @@ header {
   header {
     border-radius: 0px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
     margin: 0 auto;
 
   }

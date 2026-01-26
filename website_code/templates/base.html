@@ -25,11 +25,21 @@
                 <span></span>
                 <span></span>
             </div>
+            
             <nav id = "navBar">
                 <ul>
-                    <li><a href="{{url_for('home')}}">Home</a></li>
+                    <li><a href="{{url_for('exchange_rates')}}">Exchange Rates</a></li>
+                    <li><a href="{{url_for('transfer')}}">Transfer Funds</a></li>
+                    <li><a href="{{url_for('widthdraw')}}">Widthdraw</a></li>
+                    <li><a href="{{url_for('deposit')}}">Deposit</a></li>
                  </ul>
             </nav>
+            <div id = "ProfileDiv">
+                <div class="InlineButtons">
+                    <button>Log In</button>
+                    <button>Create Account</button>
+                </div>
+            </div>
         </header>
         <main>
             {% block content %}
