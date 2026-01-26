@@ -1,0 +1,428 @@
+h1,
+h2,
+h3 {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 40px;
+}
+
+h2 {
+  font-size: 30px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+.aligncenter {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: rgb(245, 245, 245);
+}
+
+.container {
+  width: 100%;
+  margin: 0 auto;
+
+  overflow: visible;
+
+}
+
+.InlineButtons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+}
+
+.InlineButtons button {
+  margin: 10px;
+}
+
+#logo-img {
+  min-width: 50px;
+  height: auto;
+  cursor: pointer;
+}
+
+#Logo,
+#logo-img {
+  padding-left: 10px;
+  display: flex;
+  text-align: center;
+
+}
+
+header,
+#Logo {
+  background-color: #0A437C;
+}
+
+nav ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+nav ul li {
+  border-bottom: 1px solid #ccc;
+  padding: 5px;
+}
+
+nav ul li a {
+  display: inline-block;
+  width: 100%;
+  font-weight: bold;
+  text-decoration: none;
+  color: #fff;
+  padding: 8px 0;
+}
+
+nav ul li :hover {
+  padding-left: 10px;
+  border-left: 1px solid #F28B30;
+}
+
+footer {
+  background-color: #0A437C;
+  color: #fff;
+  border-top: 1px solid #ccc;
+  margin: 20px 10px 10px 0;
+  font-size: 0.8em;
+  text-align: center;
+  font-style: italic;
+}
+
+.resize-img {
+  width: 100%;
+  height: auto;
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sectionHolder {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: row;
+}
+
+.section {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+  margin: 20px auto;
+  border: none;
+  border-bottom: 1px solid rgb(220, 220, 220);
+  padding-bottom: 10px;
+}
+
+
+
+.section:first-of-type {
+  border-top: 1px solid rgb(220, 220, 220);
+}
+
+.insidesection {
+  margin: 8px;
+  padding: 10px;
+  border: 1px solid rgb(220, 220, 220);
+  border-radius: 4px;
+  box-shadow: 0 0 10px #242424;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+
+}
+
+#beigeBack {
+  background-color: beige;
+}
+
+#lightblueBack {
+  background-color: rgb(220, 245, 240);
+}
+
+@keyframes buttonHoverEffect {
+  from {
+    background-color: #F28B30;
+    width: 120px;
+    height: 30px;
+  }
+
+  to {
+    background-color: #884a14;
+    width: 130px;
+    height: 35px;
+  }
+}
+
+button {
+  background-color: #F28B30;
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 4px;
+  box-shadow: 0 0 10px #242424;
+  width: 120px;
+  height: 33px;
+  cursor: pointer;
+}
+
+button:hover {
+  animation-name: buttonHoverEffect;
+  animation-duration: .2s;
+  background-color: #884a14;
+  width: 130px;
+  height: 35px;
+}
+
+
+
+@keyframes imgSliderHoverEffect {
+  from {
+    width: 85%;
+    margin: 7.5%;
+  }
+
+  to {
+    width: 90%;
+    margin: 5%;
+  }
+}
+
+@keyframes imgSliderUnhoverEffect {
+  from {
+    width: 90%;
+    margin: 5%;
+  }
+
+  to {
+    width: 85%;
+    margin: 7.5%;
+  }
+
+}
+
+#imgSlider {
+  animation-name: imgSliderUnhoverEffect;
+  animation-duration: .2s;
+  width: 85%;
+  margin: 7.5%;
+  cursor: pointer;
+
+}
+
+#imgSlider:hover {
+  animation-name: imgSliderHoverEffect;
+  animation-duration: .2s;
+  width: 90%;
+  margin: 5%;
+
+}
+
+.ListInSection {
+  text-align: left;
+}
+
+.RomanNumeralsList {
+  list-style: lower-roman;
+  text-align: left;
+}
+
+.RomanNumeralsList li {
+  font-weight: bold;
+}
+
+.RomanNumeralsList li p {
+  font-weight: normal;
+}
+
+table {
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
+}
+
+th,
+td {
+  padding: 10px 4px;
+  text-align: center;
+  border: 1px solid black;
+}
+
+tr td:first-of-type {
+  background-color: rgb(244, 244, 244);
+  font-weight: bold;
+}
+
+header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 10px solid #F28B30;
+}
+
+/* Burger Menu Styles */
+@media (max-width:950px) {
+  nav {
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height 0.1s ease-in-out;
+  }
+
+  nav.active {
+    max-height: 500px;
+    overflow: visible;
+  }
+
+  .burger-menu {
+    display: block;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 25px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  .burger-menu span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    background: #fff;
+    border-radius: 3px;
+    opacity: 1;
+    left: 0;
+    transition: .25s ease-in-out;
+  }
+
+  .burger-menu span:nth-child(1) {
+    top: 0px;
+  }
+
+  .burger-menu span:nth-child(2) {
+    top: 10px;
+  }
+
+  .burger-menu span:nth-child(3) {
+    top: 20px;
+  }
+
+  .burger-menu.active span:nth-child(1) {
+    opacity: 0;
+
+    top: -30px;
+  }
+
+  .burger-menu.active span:nth-child(2) {
+    top: 10px;
+    transform: rotate(-135deg);
+
+  }
+
+  .burger-menu.active span:nth-child(3) {
+    top: 10px;
+
+    transform: rotate(135deg);
+  }
+}
+
+/* END OF Burger Menu Styles */
+
+
+/* -- DESKTOP --*/
+@media (min-width:950px) {
+  
+  .InlineButtons {
+    flex-direction: row;
+  }
+
+  nav li a:hover {
+    color: #7e8aa2;
+  }
+
+  .container {
+    margin: auto;
+    max-width: 1500px;
+    min-width: 600px;
+  }
+
+
+
+  nav ul {
+    padding: 0;
+    flex-direction: row;
+    flex-wrap: initial;
+    justify-content: center;
+  }
+
+  nav ul li {
+    display: inline;
+    padding-left: 20px;
+    padding-right: 20px;
+    border: none;
+    border-top: 1px solid #7e8aa2;
+    ;
+    border-left: 1px solid #7e8aa2;
+
+  }
+
+  nav ul li :hover {
+    border: none;
+    padding-left: 0px;
+    border-bottom: 1px solid #F28B30;
+  }
+
+  nav li:last-child {
+
+    border-right: 1px solid #7e8aa2;
+  }
+
+  header {
+    border-radius: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+
+  }
+
+  .section {
+    flex-direction: row;
+  }
+
+  .reverseDesktopDisplay {
+    flex-direction: row-reverse;
+  }
+
+  .DesktopImages {
+    min-width: 400px;
+  }
+
+  .DesktopSmallerImages {
+    max-width: 400px;
+  }
+
+}
