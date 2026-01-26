@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block description %}
+<meta name="description" content="The home page of the TransSmart website">{% endblock %}
+
+{% block title %}TransSmart | Log In{% endblock %}
+{% block java %}{% endblock %}
+{% block content %}
+<div class="section reverseDesktopDisplay">
+    <div class="insidesection BigSection">
+        <h1>Login</h1>
+        <p>Please enter your email and password below.</p>
+        <form>
+            <label for ="email">Email</label>
+            <input type="text" name="email" id = "email"></input>
+         
+            <label for ="password">Password</label>
+            <input type="text" name="password" id = "password"></input>
+        </form>
+           <br></br>
+           <p>Password must be 8-20 characters long with atleast 1 special character(e.g. _,&, !, *, $)</p>
+        <button>Create Account</button>
+
+    </div>
+    <p><img src="{{url_for('static', filename = 'images/man-pointing-at-card.png')}}"
+            alt="A man holding a credit card pointing at it." class="resize-img DesktopSmallerImages" id = "beigeBack"></p>
+</div>
+{% endblock %}

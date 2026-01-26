@@ -22,6 +22,14 @@ def transfer():
 def exchange_rates():
     return render_template('exchange_rates.html')
 
+@app.route('/login')
+def login():
+    return render_template('log_in.html')
+
+@app.route('/createaccount')
+def createaccount():
+    return render_template('create_account.html')
+
 
 
 if __name__ == '__main__':
