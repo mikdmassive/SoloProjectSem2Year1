@@ -1,5 +1,6 @@
 from flask import Flask, render_template
-
+from config import db_config 
+import mysql.connector
 app = Flask(__name__)
 
 @app.route('/')
