@@ -9,15 +9,27 @@
     <div class="insidesection BigSection">
         <h1>Login</h1>
         <p>Please enter your email and password below.</p>
-        <form>
+        
+        <form method="post">
             <label for ="email">Email</label>
             <input type="text" name="email" id = "email"></input>
          
             <label for ="password">Password</label>
-            <input type="password" name="password" id = "password"></input>
+            <input type="password" name="password" id = "password"></input><br/>
+            {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <div class = "flash {{ category }}">
+                        {{ msg }}
+                    </div>
+                {% endfor %}
+                <br/>
+            {% endif %}
+        {% endwith %}
+            <button type ="submit">Login</button>
         </form>
-           <br></br>
-        <button>Login</button>
+          
+       
 
     </div>
     <p><img src="{{url_for('static', filename = 'images/suprised-man-looking-at-card.png')}}"

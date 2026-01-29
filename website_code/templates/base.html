@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     {% block description %}{% endblock %}
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/style.css') }}" />
 
     <title>{% block title %}TransSmart{% endblock %}</title>
@@ -17,28 +17,36 @@
         <header>
             <div id="Logo">
                 <p><img src="{{url_for('static', filename = 'images/logo.webp')}}" alt="Logo" style="width:100px"
-                        id="logo-img"onclick="location.replace('/')""></p>
+                        id="logo-img" onclick="location.replace('/')""></p>
 
             </div>
-            <div class="burger-menu" id="burgerMenu">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class=" burger-menu" id="burgerMenu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
             </div>
-            
-            <nav id = "navBar">
+
+            <nav id="navBar">
                 <ul>
                     <li><a href="{{url_for('exchange_rates')}}">Exchange Rates</a></li>
                     <li><a href="{{url_for('transfer')}}">Transfer Funds</a></li>
                     <li><a href="{{url_for('widthdraw')}}">Widthdraw</a></li>
                     <li><a href="{{url_for('deposit')}}">Deposit</a></li>
-                 </ul>
+                </ul>
             </nav>
-            <div id = "ProfileDiv">
+            <div id="ProfileDiv">
+                {% if user %}
+                <div class="flex">
+                    <p>Welcome, {{ user.First_Name }} {{ user.Last_Name }}</p>
+                     <button onclick="location.replace('/login')">placeholder</button>
+                </div>
+                {% else %}
                 <div class="InlineButtons">
                     <button onclick="location.replace('/login')">Log In</button>
                     <button onclick="location.replace('/createaccount')"></buttononclick>Create Account</button>
                 </div>
+
+                {% endif %}
             </div>
         </header>
         <main>

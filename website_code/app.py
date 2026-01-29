@@ -1,11 +1,29 @@
-from flask import Flask, render_template
+from flask import Flask,redirect,session, render_template,request,url_for,flash
 from config import db_config 
 import mysql.connector
-app = Flask(__name__)
+import hashlib
+import secrets
 
+app = Flask(__name__)
+app.secret_key = secrets.token_hex(32)
+def getUserFromEmail(email):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM user WHERE Email = %s",(email,))
+    user = cursor.fetchone()
+    cursor.close()
+    if user:
+        return user
+    else:
+        return ""
+def loginChecker():
+    if "user_email" not in session:
+        return ""
+    else:
+        return session["user_email"]
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html',user = getUserFromEmail(loginChecker()))
 
 @app.route('/deposit')
 def deposit():
@@ -23,8 +41,29 @@ def transfer():
 def exchange_rates():
     return render_template('exchange_rates.html')
 
-@app.route('/login')
+@app.route('/login',methods=["GET","POST"])
 def login():
+    if request.method =="POST":
+        email = request.form["email"]
+        password = request.form["password"]
+
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT Email,Password FROM user WHERE Email = %s",(email,)
+        )
+        user = cursor.fetchone()
+        cursor.close()
+        if user:
+            if password == user[1]:
+                session["user_email"] = user[0]
+                return redirect(url_for('home'))
+            else:
+                flash("Incorrect Password","error")
+                
+        else:
+            flash("Email not found.","error")
+
     return render_template('log_in.html')
 
 @app.route('/createaccount')
