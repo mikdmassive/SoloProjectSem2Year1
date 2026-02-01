@@ -17,15 +17,15 @@
             <label for ="password">Password</label>
             <input type="password" name="password" id = "password"></input><br/>
             {% with messages = get_flashed_messages(with_categories = true) %}
-            {% if messages %}
-                {% for category, msg in messages %}
-                    <div class = "flash {{ category }}">
-                        {{ msg }}
-                    </div>
-                {% endfor %}
-                <br/>
-            {% endif %}
-        {% endwith %}
+                {% if messages %}
+                    {% for category, msg in messages %}
+                        <div class = "flash {{ category }}">
+                            {{ msg }}
+                        </div>
+                    {% endfor %}
+                    <br/>
+                {% endif %}
+            {% endwith %}
             <button type ="submit">Login</button>
         </form>
           

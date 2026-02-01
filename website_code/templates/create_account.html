@@ -9,7 +9,7 @@
     <div class="insidesection BigSection">
         <h1>Create Account</h1>
         <p>Please enter your email and password below.</p>
-        <form>
+        <form method="post">
             <label for ="email">Email</label>
             <input type="text" name="email" id = "email"></input>
             <label for ="fname">First Name</label>
@@ -18,9 +18,24 @@
             <input type="text" name="lname" id = "lname"></input>
             <label for ="password">Password</label>
             <input type="password" name="password" id = "password"></input>
+              {% with messages = get_flashed_messages(with_categories = true) %}
+                {% if messages %}
+                        <br/>
+
+                        {% for category, msg in messages %}
+                            <div class = "flash {{ category }}">
+                                {{ msg }}
+                            </div>
+                        {% endfor %}
+                        <br/>
+                {% endif %}
+            {% endwith %}
+            <p>Password must be 8-20 characters long with atleast 1 special character<br/>(e.g. _,&, !, *, $)</p>
+            <button type ="submit">Create Account</button>
+            
+          
         </form>
-        <p>Password must be 8-20 characters long with atleast 1 special character<br/>(e.g. _,&, !, *, $)</p>
-        <button>Create Account</button>
+        
 
     </div>
     <p><img src="{{url_for('static', filename = 'images/man-pointing-at-card.png')}}"
