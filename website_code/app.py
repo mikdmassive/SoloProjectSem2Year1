@@ -88,7 +88,7 @@ def login():
     else:
         return redirect(url_for('home'))
 @app.route('/createaccount',methods=["GET","POST"])
-def createaccount():#
+def createaccount():
     if loginChecker()=="":
         if request.method =="POST":
             email = request.form["email"]
