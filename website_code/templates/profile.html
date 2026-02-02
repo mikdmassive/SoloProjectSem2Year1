@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block description %}
+<meta name="description" content="The profile viewer of the logged in user.">{% endblock %}
+
+{% block title %}TransSmart | {{ user.First_Name }} {{ user.Last_Name }}{% endblock %}
+{% block java %}{% endblock %}
+{% block content %}
+<div class="section">
+    <div class="insidesection grayBack">
+        <h2 class="underline">Profile Information</h2>
+        <div class="flexrow spacearound">
+            <div class="flex smalllines">
+                <p>First Name:</p>
+                <p class="roundedbox">{{ user.First_Name }}</p>
+            </div>
+            <div class="flex smalllines">
+                <p>Last Name:</p>
+                <p class="roundedbox">{{ user.Last_Name }}</p>
+            </div>
+        </div>
+        <div class="flexrow">
+            <p>Email:</p>
+            <p class="roundedbox">{{ user.Email }}</p>
+        </div>
+    </div>
+    <div class="insidesection grayBack">
+        <h2 class="underline">UK Bank Account</h2>
+        {% if user.UKBankAcc_AccountNumber %}
+            <p>ye</p>
+        {% else %}
+            <p>na</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

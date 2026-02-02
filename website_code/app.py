@@ -60,6 +60,14 @@ def transfer():
 def exchange_rates():
     return render_template('exchange_rates.html',user = getUserFromEmail(loginChecker()))
 
+
+@app.route('/profile')
+def profile():
+    user = getUserFromEmail(loginChecker())
+    if user:
+        return render_template('profile.html',user=user)
+    else:
+        return redirect(url_for('home'))
 @app.route('/login',methods=["GET","POST"])
 def login():
     if loginChecker()=="":
