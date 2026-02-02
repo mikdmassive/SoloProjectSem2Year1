@@ -130,6 +130,11 @@ nav ul li :hover {
 .flexrow.spacearound{
   justify-content: space-around;
 }
+.right{
+  justify-content: right;
+  align-items: end;
+  text-align: right;
+}
 
 footer {
   background-color: #434343;

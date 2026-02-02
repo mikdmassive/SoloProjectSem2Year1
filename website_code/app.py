@@ -22,6 +22,44 @@ def loginChecker():
         return ""
     else:
         return session["user_email"]
+def returnBankNameFromSortCode(sc):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM bank WHERE SortCode = %s",(sc,))
+    bank = cursor.fetchone()
+    cursor.close()
+    if bank:
+        return bank["BankName"]
+    else:
+        return ""
+def returnBankAcc(an,sc):
+    if an is not None and sc is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM bank_account WHERE SortCode = '"+sc+"' AND AccountNumber = '"+an+"';")
+        bankacc = cursor.fetchone()
+        cursor.close()
+        if bankacc:
+            return bankacc
+        else:
+            return ""
+    else:
+        return ""
+    
+def getCurrencyFromID(id):
+    if id is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM currency WHERE CurrencyID = '"+id+"';")
+        cs = cursor.fetchone()
+        cursor.close()
+        if cs:
+            return cs
+        else:
+            return ""
+    else:
+        return ""
+
 # input validations
 def emailValidChecker(email):
     regExpression_Email = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
@@ -61,13 +99,49 @@ def exchange_rates():
     return render_template('exchange_rates.html',user = getUserFromEmail(loginChecker()))
 
 
-@app.route('/profile')
+@app.route('/profile',methods=["GET","POST"])
 def profile():
     user = getUserFromEmail(loginChecker())
     if user:
-        return render_template('profile.html',user=user)
+        userbankacc = returnBankAcc(user["UKBankAcc_AccountNumber"],user["UKBankAcc_SortCode"])
+        userbankname = returnBankNameFromSortCode(user["UKBankAcc_SortCode"])
+        currency = ""
+        if userbankacc:
+            currency = getCurrencyFromID(userbankacc["CurrencyID"])
+        if request.method =="POST":
+            accountnumber = request.form["accountnumber"]
+            sortcode = request.form["sortcode"]
+            password = request.form["password"]
+            bankacc = returnBankAcc(accountnumber,sortcode)
+            
+
+            if bankacc:
+                if bankacc["CurrencyID"] == "GBP":
+                    if password == bankacc["Password"]:
+                        conn = mysql.connector.connect(**db_config)
+                        cursor = conn.cursor()
+                        cursor.execute(
+                            "UPDATE `transsmartdatabase`.`user` SET `UKBankAcc_AccountNumber` = %s , `UKBankAcc_SortCode` = %s WHERE `Email`= %s;",
+                            (accountnumber,sortcode,user["Email"])
+                        )
+                        conn.commit()
+                        cursor.close()
+                        return redirect(url_for('profile'))
+
+                    else:
+                        flash("Incorrect password.","error")
+                        
+                else:
+                    flash("The currency in this account is not GBP.","error")
+                    
+            else:
+                flash("Bank Account not found.","error")
+
+        return render_template('profile.html',user=user,userbankacc = userbankacc,userbankname=userbankname,currency=currency)
     else:
         return redirect(url_for('home'))
+    
+
 @app.route('/login',methods=["GET","POST"])
 def login():
     if loginChecker()=="":
