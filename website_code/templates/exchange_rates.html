@@ -1,8 +1,71 @@
 {% extends "base.html" %}
-{% block description %}<meta name="description" content="The home page of the TransSmart website">{% endblock %}
+{% block description %}
+<meta name="description" content="The home page of the TransSmart website">{% endblock %}
 
 {% block title %}TransSmart | Exchange Rates{% endblock %}
 {% block java %}{% endblock %}
 {% block content %}
+<div class="section">
+    <form method="post" class="insidesection">
+        <div class="flexrow spacearound mobilecollumflex FullWidth">
+            <div class="flex">
+                <label for="refcurrency">Reference Currency</label>
+                <input type="text" name="refcurrency" id="refcurrency"></input>
+            </div>
+            <div class="flex">
+                <label for="transfercurrency">Transfer Currency</label>
+                <input type="text" name="transfercurrency" id="transfercurrency"></input>
+            </div>
+        </div>
+        {% with messages = get_flashed_messages(with_categories = true) %}
+        {% if messages %}
 
+        {% for category, msg in messages %}
+        <div class="flash {{ category }}">
+            {{ msg }}
+        </div>
+        {% endfor %}
+        <br />
+        {% endif %}
+        {% endwith %}
+        </br>
+        <button type="submit">Calculate</button>
+        </br>
+
+        <div class="insidesection">
+            {% if fromcurrency and tocurrency and fromcurrency %}
+            <div class="flexrow spacearound FullWidth">
+
+                <div class="flex">
+                    <p class="roundedbox">{{ fromcurrency.CurrencyID }}</p>
+                    <p>{{ fromcurrency.Symbol }}1</p>
+                </div>
+                <h2>=</h2>
+                <div class="flex">
+                    <p class="roundedbox">{{ tocurrency.CurrencyID }}</p>
+                    <p>{{ tocurrency.Symbol }}{{ result }}</p>
+                </div>
+
+            </div>
+            {% else %}
+            <h2 class="underline">Exchange Rate Calculator</h2>
+            <p>Here you can select a currency to view its worth in another.</p>
+
+            <h3 class="underline">Please select:</h3>
+
+            <ul class="RomanNumeralsList left FullWidth">
+
+                <li>
+                    <p>A currency to convert from</p>
+                </li>
+                <li>
+                    <p>A currency to convert to</p>
+                </li>
+            </ul>
+
+
+            {% endif %}
+        </div>
+    </form>
+</div>
 {% endblock %}

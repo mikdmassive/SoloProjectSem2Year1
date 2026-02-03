@@ -135,7 +135,11 @@ nav ul li :hover {
   align-items: end;
   text-align: right;
 }
-
+.left{
+  justify-content: left;
+  align-items: start;
+  text-align: left;
+}
 footer {
   background-color: #434343;
   color: #fff;
@@ -203,6 +207,15 @@ footer {
   text-align: center;
 
 
+}
+
+.insidesection .insidesection h1, 
+.insidesection .insidesection h2, 
+.insidesection .insidesection h3,
+.insidesection .insidesection ul,
+.insidesection .insidesection p{
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 
 #beigeBack {
@@ -373,7 +386,9 @@ header {
 
 /* Burger Menu Styles */
 @media (max-width:950px) {
-
+  .mobilecollumflex{
+    flex-direction: column;
+  }
   #Logo,
   #logo-img {
     text-align: left;
@@ -544,6 +559,9 @@ header {
   .BigSection {
     min-width: 400px;
     
+  }
+  .FullWidth{
+    width: 100%;
   }
   .DesktopSmallerImages {
     max-width: 300px;

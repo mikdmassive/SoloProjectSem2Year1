@@ -59,6 +59,13 @@ def getCurrencyFromID(id):
             return ""
     else:
         return ""
+def getAllCurrencies():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM currency;")
+    currencies = cursor.fetchall()
+    cursor.close()
+    return currencies
 
 # input validations
 def emailValidChecker(email):
@@ -84,19 +91,51 @@ def home():
 
 @app.route('/deposit')
 def deposit():
-    return render_template('deposit.html',user = getUserFromEmail(loginChecker()))
+    user = getUserFromEmail(loginChecker())
+    if user:
+        return render_template('deposit.html',user = user)
+    else:
+        return redirect(url_for('login'))
+        
 
 @app.route('/widthdraw')
 def widthdraw():
-    return render_template('widthdraw.html',user = getUserFromEmail(loginChecker()))
+    user = getUserFromEmail(loginChecker())
+    if user:
+        return render_template('widthdraw.html',user = user)
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/transfer')
 def transfer():
-    return render_template('transfer.html',user = getUserFromEmail(loginChecker()))
+    user = getUserFromEmail(loginChecker())
+    if user:
+        return render_template('transfer.html',user = user)
+    else:
+        return redirect(url_for('login'))
 
-@app.route('/exchange_rates')
+@app.route('/exchange_rates',methods=["GET","POST"])
 def exchange_rates():
-    return render_template('exchange_rates.html',user = getUserFromEmail(loginChecker()))
+    currencies = getAllCurrencies()
+    result = None
+    fromcurrency = None
+    tocurrency = None
+    if request.method =="POST":
+        string_fromcurrency = request.form["refcurrency"]
+        string_tocurrency = request.form["transfercurrency"]
+        fromcurrency = getCurrencyFromID(string_fromcurrency)
+        tocurrency = getCurrencyFromID(string_tocurrency)
+        if  (fromcurrency and tocurrency):
+            ratesmap = {c["CurrencyID"]:c["ValueAgainstPound"] for c in currencies}
+
+            ##maths would want 
+            fromcurrency_OnePound = ratesmap[string_fromcurrency]
+            result = fromcurrency_OnePound/ratesmap[string_tocurrency]
+            result= round(result,2)
+        else:
+            flash("Currencies invalid.","error")
+
+    return render_template('exchange_rates.html',user = getUserFromEmail(loginChecker()),result=result,fromcurrency=fromcurrency,tocurrency=tocurrency)
 
 
 @app.route('/profile',methods=["GET","POST"])
@@ -140,7 +179,30 @@ def profile():
         return render_template('profile.html',user=user,userbankacc = userbankacc,userbankname=userbankname,currency=currency)
     else:
         return redirect(url_for('home'))
+@app.route('/removebankaccount')
+def removebankacc():
+    user = getUserFromEmail(loginChecker())
+    if user:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE `transsmartdatabase`.`user` SET `UKBankAcc_AccountNumber` = null , `UKBankAcc_SortCode` = null WHERE `Email`= %s;",
+            (user["Email"],)
+        )
+        conn.commit()
+        cursor.close()
+        return redirect(url_for('profile'))
+    else:
+        return redirect(url_for('home'))
     
+@app.route('/logout')
+def logout():
+    user = getUserFromEmail(loginChecker())
+    if user:
+        session.clear()
+        return redirect(url_for('home'))
+    else:
+        return redirect(url_for('home'))
 
 @app.route('/login',methods=["GET","POST"])
 def login():
@@ -169,6 +231,7 @@ def login():
         return render_template('log_in.html')
     else:
         return redirect(url_for('home'))
+    
 @app.route('/createaccount',methods=["GET","POST"])
 def createaccount():
     if loginChecker()=="":
@@ -210,9 +273,14 @@ def createaccount():
     else:
         return redirect(url_for('home'))
 
+@app.route('/currencyaccounts',methods=["GET","POST"])
+def currencyaccounts():
+    user = getUserFromEmail(loginChecker())
+    if user:
+        return render_template('currencyaccounts.html',user=user)
+    else:
+        return redirect(url_for('home'))
 
-
-    
 
 
 

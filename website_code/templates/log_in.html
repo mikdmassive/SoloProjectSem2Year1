@@ -7,8 +7,7 @@
 {% block content %}
 <div class="section">
     <div class="insidesection BigSection">
-        <h1>Login</h1>
-        <p>Please enter your email and password below.</p>
+        <h1 class ="underline">Login</h1>
         
         <form method="post">
             <label for ="email">Email</label>
@@ -28,7 +27,12 @@
             {% endwith %}
             <button type ="submit">Login</button>
         </form>
-          
+        </br>
+        <div class="insidesection">
+            <h3>No Account?</h3>
+            <p>No worries. Create one using the button below!</p>
+            <button onclick="location.replace('/createaccount')">Create Account</button>
+        </div>
        
 
     </div>

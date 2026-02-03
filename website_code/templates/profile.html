@@ -6,69 +6,90 @@
 {% block java %}{% endblock %}
 {% block content %}
 <div class="section">
-    <div class="insidesection grayBack">
-        <h2 class="underline">Profile Information</h2>
-        <div class="flexrow spacearound">
-            <div class="flex smalllines">
-                <p>First Name:</p>
-                <p class="roundedbox">{{ user.First_Name }}</p>
+    <div class="flex">
+        <div class="insidesection grayBack">
+            <h2 class="underline">Profile Information</h2>
+            <div class="flexrow spacearound">
+                <div class="flex smalllines">
+                    <p>First Name:</p>
+                    <p class="roundedbox">{{ user.First_Name }}</p>
+                </div>
+                <div class="flex smalllines">
+                    <p>Last Name:</p>
+                    <p class="roundedbox">{{ user.Last_Name }}</p>
+                </div>
             </div>
-            <div class="flex smalllines">
-                <p>Last Name:</p>
-                <p class="roundedbox">{{ user.Last_Name }}</p>
+            <div class="flexrow">
+                <p>Email:</p>
+                <p class="roundedbox">{{ user.Email }}</p>
+            </div>
+            <div class="insidesection">
+                <h3>Log Out</h3>
+                <p>Press below to log out of TransSmart</p>
+                <button onclick="location.replace('/logout')">Log Out</button>
+
             </div>
         </div>
-        <div class="flexrow">
-            <p>Email:</p>
-            <p class="roundedbox">{{ user.Email }}</p>
+        <div class="insidesection grayBack">
+            <h2 class = "underline">Currency Accounts</h2>
+            <p>Press below to view or create currency accounts.</p>
+            <button onclick="location.replace('/currencyaccounts')">View Accounts</button>
+
         </div>
     </div>
+
     <div class="insidesection grayBack">
         <h2 class="underline">UK Bank Account</h2>
         {% if userbankacc and userbankname %}
-            <div class="flex right">
-                <div class="flexrow">
-                    <p>Sort Code:</p>
-                    <p class="roundedbox">{{ userbankacc.SortCode }}</p>
-                </div>
-                <div class="flexrow">
-                    <p>Account Number:</p>
-                    <p class="roundedbox">{{ userbankacc.AccountNumber }}</p>
-                </div>
-                <div class="flexrow">
-                    <p>Bank Name:</p>
-                    <p class="roundedbox">{{ userbankname }}</p>
-                </div>
-                <div class="flexrow">
-                    <p>Name:</p>
-                    <p class="roundedbox">{{ userbankacc.First_Name }} {{ userbankacc.Last_Name }}</p>
-                </div>
-                <div class="flexrow">
-                    <p>Balance:</p>
-                    <p class="roundedbox">{{ currency.Symbol }}{{ userbankacc.Balance }}</p>
-                </div>
+        <div class="flex right">
+            <div class="flexrow">
+                <p>Sort Code:</p>
+                <p class="roundedbox">{{ userbankacc.SortCode }}</p>
             </div>
+            <div class="flexrow">
+                <p>Account Number:</p>
+                <p class="roundedbox">{{ userbankacc.AccountNumber }}</p>
+            </div>
+            <div class="flexrow">
+                <p>Bank Name:</p>
+                <p class="roundedbox">{{ userbankname }}</p>
+            </div>
+            <div class="flexrow">
+                <p>Name:</p>
+                <p class="roundedbox">{{ userbankacc.First_Name }} {{ userbankacc.Last_Name }}</p>
+            </div>
+            <div class="flexrow">
+                <p>Balance:</p>
+                <p class="roundedbox">{{ currency.Symbol }}{{ userbankacc.Balance }}</p>
+            </div>
+        </div>
+        <div class="insidesection">
+            <h3>Remove Bank Account</h3>
+            <p>Press below to disconnect the UK Bank Account</p>
+            <button onclick="location.replace('/removebankaccount')">Disconnect</button>
+
+        </div>
         {% else %}
-            <p>Please enter your sortcode, account number, and password below.</p>
-            <form method="post">
-                <label for ="sortcode">Sort Code</label>
-                <input type="text" name="sortcode" id = "sortcode"></input>
-                <label for ="accountnumber">Account Number</label>
-                <input type="text" name="accountnumber" id = "accountnumber"></input>
-                <label for ="password">Password</label>
-                <input type="password" name="password" id = "password"></input><br/>
-                {% with messages = get_flashed_messages(with_categories = true) %}
-                    {% if messages %}
-                        {% for category, msg in messages %}
-                            <div class = "flash {{ category }}">
-                                {{ msg }}
-                            </div>
-                        {% endfor %}
-                        <br/>
-                    {% endif %}
-                {% endwith %}
-                <button type ="submit">Add</button>
-            </form>
+        <p>Please enter your sortcode, account number, and password below.</p>
+        <form method="post">
+            <label for="sortcode">Sort Code</label>
+            <input type="text" name="sortcode" id="sortcode"></input>
+            <label for="accountnumber">Account Number</label>
+            <input type="text" name="accountnumber" id="accountnumber"></input>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password"></input><br />
+            {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+            {% for category, msg in messages %}
+            <div class="flash {{ category }}">
+                {{ msg }}
+            </div>
+            {% endfor %}
+            <br />
+            {% endif %}
+            {% endwith %}
+            <button type="submit">Add</button>
+        </form>
         {% endif %}
     </div>
 
