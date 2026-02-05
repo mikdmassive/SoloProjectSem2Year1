@@ -3,6 +3,7 @@ from config import db_config
 import mysql.connector
 import hashlib
 import re
+from decimal import Decimal,InvalidOperation
 import secrets
 
 app = Flask(__name__)
@@ -59,6 +60,19 @@ def getCurrencyFromID(id):
             return ""
     else:
         return ""
+def getCurrencyAccFromID(id):
+    if id is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM currency_account WHERE CurrencyAccountID = '"+id+"';")
+        cs = cursor.fetchone()
+        cursor.close()
+        if cs:
+            return cs
+        else:
+            return ""
+    else:
+        return ""
 def getAllCurrencies():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
@@ -66,7 +80,35 @@ def getAllCurrencies():
     currencies = cursor.fetchall()
     cursor.close()
     return currencies
+def getAllCurrencyAccountsFromEmail(email):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM currency_account WHERE Email = '"+email+"';")
+    CurrencyAccounts = cursor.fetchall()
+    cursor.close()
+    return CurrencyAccounts
 
+# misc
+def formatConversion(amt):
+    str_amt = format(amt,'f')
+    if "." not in str_amt:
+        return amt+".00"
+    else:
+        int_num, dec_part = str_amt.split('.')
+        dec_part = dec_part[:2]+dec_part[2:].rstrip('0')
+        return int_num+"."+dec_part
+
+def generateCurrencyAccountID():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM currency_account;")
+    CurrencyAccounts = cursor.fetchall()
+    cursor.close()
+    numatend = len(CurrencyAccounts)
+    while getCurrencyAccFromID("CR"+str(numatend)):
+        numatend = numatend+1
+    
+    return "CR"+str(numatend)
 # input validations
 def emailValidChecker(email):
     regExpression_Email = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
@@ -74,6 +116,9 @@ def emailValidChecker(email):
 def userNameValidChecker(name):
     regExpression_Name = r"^[A-Za-z][A-Za-z'-]{1,44}$"# name is varchar(45)
     return re.match(regExpression_Name,name) is not None
+def currencyaccountNameValidChecker(name):
+    regExpression_Name = r"^[A-Za-z0-9]{4,45}$"# name is varchar(45)
+    return re.match(regExpression_Name,"".join(name.split())) is not None
 def passwordValidationCheck(password):
     specialChars = "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
     valid = False
@@ -106,11 +151,61 @@ def widthdraw():
     else:
         return redirect(url_for('login'))
 
-@app.route('/transfer')
+@app.route('/transfer',methods=["GET","POST"])
 def transfer():
     user = getUserFromEmail(loginChecker())
     if user:
-        return render_template('transfer.html',user = user)
+        print("Setting Values")
+        user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
+        currencies = getAllCurrencies()
+        selectCASending = None
+        selectCARecieving = None
+        selectCASendingCurrency = None
+        displayresult = None
+        selectCARecievingCurrency = None
+        result = None
+        amounttoconv = 1
+        if request.method =="POST":
+            action = request.form.get("action")
+            raw_selectCASending = request.form["selectCASending"]
+            raw_selectCARecieving = request.form["selectCARecieving"]
+            raw_amount = request.form.get("amount", "").strip()
+
+            selectCASending = getCurrencyAccFromID(raw_selectCASending)
+            selectCARecieving = getCurrencyAccFromID(raw_selectCARecieving)
+                
+            
+            if action =="QuickSwap":
+                temp_SwapCA = selectCARecieving
+                selectCARecieving = selectCASending
+                selectCASending = temp_SwapCA
+            #exchange rate fun stuff yay
+            if selectCARecieving and selectCASending:
+                    selectCASendingCurrency = getCurrencyFromID(selectCASending["CurrencyID"])
+                    selectCARecievingCurrency = getCurrencyFromID(selectCARecieving["CurrencyID"])
+                    if selectCARecievingCurrency and selectCASendingCurrency:
+                        try:
+                            amounttoconv = Decimal(raw_amount)
+                        except (InvalidOperation,ValueError):
+                            flash("Amount invalid, setting to 1.","error")
+                            amounttoconv = 1
+                        ##maths would want 
+                        fromcurrency_OnePound = selectCASendingCurrency["ValueAgainstPound"]
+                        result = fromcurrency_OnePound/selectCARecievingCurrency["ValueAgainstPound"]
+                        result= (result*amounttoconv)
+                        min_amnt = Decimal("0.01")
+                        result = (result.quantize(min_amnt))
+                        if result<min_amnt:
+                            displayresult = "<0.01"
+                        else:
+                            displayresult = formatConversion(result)
+                        
+
+            print(selectCARecieving)
+            print(selectCASending)
+
+
+        return render_template('transfer.html',user = user,user_CAs=user_CAs,currencies=currencies,selectCARecieving = selectCARecieving,selectCASending = selectCASending,selectCASendingCurrency = selectCASendingCurrency,selectCARecievingCurrency=selectCARecievingCurrency,result = displayresult, amounttoconv =amounttoconv)
     else:
         return redirect(url_for('login'))
 
@@ -118,24 +213,44 @@ def transfer():
 def exchange_rates():
     currencies = getAllCurrencies()
     result = None
-    fromcurrency = None
-    tocurrency = None
+    fromcurrency = ""
+    tocurrency = ""
+    amounttoconv = 1
+    amountdisplay = amounttoconv
     if request.method =="POST":
-        string_fromcurrency = request.form["refcurrency"]
-        string_tocurrency = request.form["transfercurrency"]
+        raw_from= request.form["refcurrency"]
+        raw_to = request.form["transfercurrency"]
+        raw_amount = request.form.get("amount", "").strip()
+        string_fromcurrency = raw_from[:3].upper()
+        string_tocurrency = raw_to[:3].upper()
         fromcurrency = getCurrencyFromID(string_fromcurrency)
         tocurrency = getCurrencyFromID(string_tocurrency)
         if  (fromcurrency and tocurrency):
+            try:
+                amounttoconv = Decimal(raw_amount)
+            except (InvalidOperation,ValueError):
+                flash("Amount invalid, setting to 1.","error")
+                amounttoconv = 1
+
             ratesmap = {c["CurrencyID"]:c["ValueAgainstPound"] for c in currencies}
 
             ##maths would want 
             fromcurrency_OnePound = ratesmap[string_fromcurrency]
             result = fromcurrency_OnePound/ratesmap[string_tocurrency]
-            result= round(result,2)
+            result= (result*amounttoconv)
+            min_amnt = Decimal("0.0000001")
+            amountdisplay = formatConversion((amounttoconv.quantize(min_amnt)))
+            if result<min_amnt:
+                result= f<"{min_amnt}"
+            else:
+                result = formatConversion((result.quantize(min_amnt)))
+                
+            
+
         else:
             flash("Currencies invalid.","error")
 
-    return render_template('exchange_rates.html',user = getUserFromEmail(loginChecker()),result=result,fromcurrency=fromcurrency,tocurrency=tocurrency)
+    return render_template('exchange_rates.html',user = getUserFromEmail(loginChecker()),result=result,fromcurrency=fromcurrency,tocurrency=tocurrency,currencies=currencies,amounttoconv=amounttoconv,amountdisplay = amountdisplay)
 
 
 @app.route('/profile',methods=["GET","POST"])
@@ -277,7 +392,39 @@ def createaccount():
 def currencyaccounts():
     user = getUserFromEmail(loginChecker())
     if user:
-        return render_template('currencyaccounts.html',user=user)
+        user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
+        currencies = getAllCurrencies()
+        selectedCA = None
+        currency = None
+        if request.method =="POST":
+            action = request.form.get("action")
+            if action == "createCA":
+                accname = request.form["accname"]
+                currencyid_raw = request.form["currencyid"]
+                string_currencyid = currencyid_raw[:3].upper()
+                if getCurrencyFromID(string_currencyid):
+                    if currencyaccountNameValidChecker(accname):
+                        conn = mysql.connector.connect(**db_config)
+                        cursor = conn.cursor()
+                        caID = generateCurrencyAccountID()
+                        cursor.execute(
+                            "INSERT INTO `transsmartdatabase`.`currency_account`(`CurrencyAccountID`,`Email`,`Balance`,`AccountName`,`CurrencyID`) VALUES ('"+caID+"','"+user["Email"]+"',0,'"+accname+"','"+string_currencyid+"');" 
+                        )
+                        conn.commit()
+                        cursor.close()
+                        user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
+                    else:
+                        flash("Account name invalid.","error")
+                else:
+                    flash("Currency invalid.","error")
+            elif action == "viewCA":
+                raw_selectedCA = request.form["selectCA"]
+                selectedCA = getCurrencyAccFromID(raw_selectedCA)
+                if selectedCA:
+                    currency = getCurrencyFromID(selectedCA["CurrencyID"])
+
+
+        return render_template('currencyaccounts.html',user=user,user_CAs = user_CAs,currencies=currencies,selectedCA = selectedCA,currency=currency)
     else:
         return redirect(url_for('home'))
 

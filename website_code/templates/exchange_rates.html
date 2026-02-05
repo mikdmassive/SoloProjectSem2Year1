@@ -6,15 +6,34 @@
 {% block java %}{% endblock %}
 {% block content %}
 <div class="section">
-    <form method="post" class="insidesection">
+    <form method="post" class="insidesection grayBack">
+        <datalist id="currencies">
+                {% for c in currencies %}
+                    <option value="{{ c.CurrencyID }}({{ c.Currency_Name }})"></option>
+                {% endfor %}
+        </datalist>
         <div class="flexrow spacearound mobilecollumflex FullWidth">
             <div class="flex">
                 <label for="refcurrency">Reference Currency</label>
-                <input type="text" name="refcurrency" id="refcurrency"></input>
+                {% if fromcurrency %}
+                    <input value="{{ fromcurrency.CurrencyID }}({{ fromcurrency.Currency_Name }})" type="text" name="refcurrency" id="refcurrency" placeholder="Search Currency" list = "currencies"></input>
+                {% else %}
+                    <input  type="text" name="refcurrency" id="refcurrency" placeholder="Search Currency" list = "currencies"></input>
+                {% endif %}
+
             </div>
+             <div class="flex">
+                <label for="amount">Amount</label>
+                <input type="number" name = "amount" step="0.01" value="{{ amounttoconv }}" min="0" max="99999999"></input>
+            </div>
+            
             <div class="flex">
                 <label for="transfercurrency">Transfer Currency</label>
-                <input type="text" name="transfercurrency" id="transfercurrency"></input>
+                {% if tocurrency %}
+                    <input value="{{ tocurrency.CurrencyID }}({{ tocurrency.Currency_Name }})" type="text" name="transfercurrency" id="transfercurrency" placeholder="Search Currency" list = "currencies"></input>
+                {% else %}
+                    <input type="text" name="transfercurrency" id="transfercurrency" placeholder="Search Currency" list = "currencies"></input>
+                {% endif %}
             </div>
         </div>
         {% with messages = get_flashed_messages(with_categories = true) %}
@@ -25,7 +44,6 @@
             {{ msg }}
         </div>
         {% endfor %}
-        <br />
         {% endif %}
         {% endwith %}
         </br>
@@ -37,12 +55,13 @@
             <div class="flexrow spacearound FullWidth">
 
                 <div class="flex">
-                    <p class="roundedbox">{{ fromcurrency.CurrencyID }}</p>
-                    <p>{{ fromcurrency.Symbol }}1</p>
+                    <p class="roundedbox">{{ fromcurrency.Currency_Name }}<br/>({{ fromcurrency.CurrencyID }})</p>
+                    <p>{{ fromcurrency.Symbol }}{{ amountdisplay }}</p>
                 </div>
                 <h2>=</h2>
                 <div class="flex">
-                    <p class="roundedbox">{{ tocurrency.CurrencyID }}</p>
+                    <p class="roundedbox">{{ tocurrency.Currency_Name }}<br/>({{ tocurrency.CurrencyID }})</p>
+                    
                     <p>{{ tocurrency.Symbol }}{{ result }}</p>
                 </div>
 
