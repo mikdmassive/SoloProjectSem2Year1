@@ -2,6 +2,7 @@ from flask import Flask,redirect,session, render_template,request,url_for,flash
 from config import db_config 
 import mysql.connector
 import hashlib
+import datetime
 import re
 from decimal import Decimal,InvalidOperation
 import secrets
@@ -73,6 +74,19 @@ def getCurrencyAccFromID(id):
             return ""
     else:
         return ""
+def getLogFromID(id):
+    if id is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM log WHERE LogID = '"+id+"';")
+        log = cursor.fetchone()
+        cursor.close()
+        if log:
+            return log
+        else:
+            return ""
+    else:
+        return ""
 def getAllCurrencies():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
@@ -109,6 +123,17 @@ def generateCurrencyAccountID():
         numatend = numatend+1
     
     return "CR"+str(numatend)
+def generateLogID():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM log;")
+    logs = cursor.fetchall()
+    cursor.close()
+    numatend = len(logs)
+    while getLogFromID("Log"+str(numatend)):
+        numatend = numatend+1
+    
+    return "Log"+str(numatend)
 # input validations
 def emailValidChecker(email):
     regExpression_Email = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
@@ -216,10 +241,14 @@ def transfer():
                                 cursor.execute(
                                     statement,(newbalrecieving,selectCARecieving["CurrencyAccountID"])
                                 )
+                                #TODO Add logs
+                                cursor.execute(
+                                    "INSERT INTO `transsmartdatabase`.`log`(`LogID`,`Reciever_SortCode`,`Reciever_ AccountNumber`,`CurrencyAccountID_Sender`,`CurrencyAccountID_Reciever`,`Type`,`Amount`,`TransferDateTime`)VALUES(%s,null,null,%s,%s,%s,%s,%s);",
+                                    (generateLogID(),selectCASending["CurrencyAccountID"],selectCARecieving["CurrencyAccountID"],"Transfer",amounttoconv,datetime.datetime.now())
+                                )
+                                conn.commit()
                                 conn.commit()
                                 cursor.close()
-                                #TODO Add logs
-
                                 #refresh
                                 user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
 
