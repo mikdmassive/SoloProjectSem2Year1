@@ -86,8 +86,23 @@
                 </div>
 
             </div>
+            {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+
+            {% for category, msg in messages %}
+            <div class="flash {{ category }}">
+                {{ msg }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
             <div class="insidesection grayBack">
                 <h3 class="underline">Confirm Transfer</h3>
+                <p>Please ensure all details are correct and you have a suffient balance.</p>
+                <p>Converting {{ selectCASendingCurrency.Symbol }}{{ amounttoconv }} from "{{ selectCASending.AccountName }}" into {{ selectCARecievingCurrency.Symbol }}{{ result }} for "{{ selectCARecieving.AccountName }}"</p>
+                
+                <button type="submit" name="action" value="ConfirmTransfer">Confirm</button>
+
             </div>
 
         </div>

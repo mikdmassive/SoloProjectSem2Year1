@@ -182,6 +182,7 @@ def transfer():
             #exchange rate fun stuff yay
             if selectCARecieving and selectCASending:
                     selectCASendingCurrency = getCurrencyFromID(selectCASending["CurrencyID"])
+                    min_amnt = Decimal("0.01")
                     selectCARecievingCurrency = getCurrencyFromID(selectCARecieving["CurrencyID"])
                     if selectCARecievingCurrency and selectCASendingCurrency:
                         try:
@@ -193,14 +194,43 @@ def transfer():
                         fromcurrency_OnePound = selectCASendingCurrency["ValueAgainstPound"]
                         result = fromcurrency_OnePound/selectCARecievingCurrency["ValueAgainstPound"]
                         result= (result*amounttoconv)
-                        min_amnt = Decimal("0.01")
                         result = (result.quantize(min_amnt))
                         if result<min_amnt:
                             displayresult = "<0.01"
                         else:
                             displayresult = formatConversion(result)
-                        
+                    
+                    if action == "ConfirmTransfer":
+                        #check stuff
+                        print(result)
+                        if min_amnt<=amounttoconv:
+                            newbalsending = selectCASending["Balance"]-amounttoconv
+                            newbalrecieving = selectCARecieving["Balance"]+result
+                            if newbalsending>0:
+                                conn = mysql.connector.connect(**db_config)
+                                cursor = conn.cursor()
+                                statement = "UPDATE `transsmartdatabase`.`currency_account` SET `Balance` = %s WHERE `CurrencyAccountID`= %s;"
+                                cursor.execute(
+                                    statement,(newbalsending,selectCASending["CurrencyAccountID"])
+                                )
+                                cursor.execute(
+                                    statement,(newbalrecieving,selectCARecieving["CurrencyAccountID"])
+                                )
+                                conn.commit()
+                                cursor.close()
+                                #TODO Add logs
 
+                                #refresh
+                                user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
+
+
+                                selectCASending = getCurrencyAccFromID(raw_selectCASending)
+                                selectCARecieving = getCurrencyAccFromID(raw_selectCARecieving)
+                                flash("Transfer completed.","confirm")
+                            else:
+                                flash("Insufficient funds.","error")
+                        else:
+                            flash("Amount must convert to >=0.01.","error")
             print(selectCARecieving)
             print(selectCASending)
 

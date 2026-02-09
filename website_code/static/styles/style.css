@@ -360,7 +360,6 @@ form{
   text-decoration: none;
   color: #ff0000;
   font-size: 20px;
-
   background-color: rgba(255, 0, 0, 0.231);
   background-image: url('/static/images/warning.png');
   background-repeat: no-repeat;
@@ -368,8 +367,16 @@ form{
   padding-left: 40px;
   padding-right: 10px;
 }
-input{
-  
+.flash.confirm{
+  text-decoration: none;
+  color: #11ff00;
+  font-size: 20px;
+  background-color: rgba(0, 255, 0, 0.231);
+  background-image: url('/static/images/tick.png');
+  background-repeat: no-repeat;
+  background-position: 5px 2.5px;
+  padding-left: 40px;
+  padding-right: 10px;
 }
 header {
   width: 100%;
