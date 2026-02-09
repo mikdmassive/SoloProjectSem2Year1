@@ -345,7 +345,7 @@ td {
   border: 1px solid black;
 }
 
-tr td:first-of-type {
+tr:first-of-type {
   background-color: rgb(244, 244, 244);
   font-weight: bold;
 }

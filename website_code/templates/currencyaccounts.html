@@ -47,6 +47,51 @@
                     <p class="roundedbox">{{ currency.Symbol }}{{ selectedCA.Balance }}</p>
                 </div>
             </div>
+            <h3 class ="underline">History:</h3>
+            {% if logs %}
+            <table>
+                <tr>
+                    <td>Type</td>
+                    <td>Amount</td>
+                    <td>Time</td>
+                    <td>Sender/Reciever ID</td>
+                </tr>
+                {% for log in logs %}
+                <tr>
+                    <td>
+                        {% if log.CurrencyAccountID_Sender == selectedCA.CurrencyAccountID %}
+                        Sent
+                        {% else %}
+                        Recieved
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ currency.Symbol }}
+                        {% if log.CurrencyAccountID_Sender == selectedCA.CurrencyAccountID %}
+                        {{ log.Amount }}
+                        {% else %}
+                        {{ log.Amount2 }}
+
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ log.TransferDateTime }}
+                    </td>
+                    <td>
+
+                        {% if log.CurrencyAccountID_Sender == selectedCA.CurrencyAccountID %}
+                        {{ log.CurrencyAccountID_Reciever }}
+                        {% else %}
+                        {{ log.CurrencyAccountID_Sender }}
+
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p>No history found.</p>
+            {% endif %}
             {% else %}
             <p>Select one of your currency accounts above</p>
             {% endif %}

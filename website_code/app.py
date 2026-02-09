@@ -243,10 +243,9 @@ def transfer():
                                 )
                                 #TODO Add logs
                                 cursor.execute(
-                                    "INSERT INTO `transsmartdatabase`.`log`(`LogID`,`Reciever_SortCode`,`Reciever_ AccountNumber`,`CurrencyAccountID_Sender`,`CurrencyAccountID_Reciever`,`Type`,`Amount`,`TransferDateTime`)VALUES(%s,null,null,%s,%s,%s,%s,%s);",
-                                    (generateLogID(),selectCASending["CurrencyAccountID"],selectCARecieving["CurrencyAccountID"],"Transfer",amounttoconv,datetime.datetime.now())
+                                    "INSERT INTO `transsmartdatabase`.`log`(`LogID`,`Reciever_SortCode`,`Reciever_ AccountNumber`,`CurrencyAccountID_Sender`,`CurrencyAccountID_Reciever`,`Type`,`Amount`,`TransferDateTime`,`Amount2`)VALUES(%s,null,null,%s,%s,%s,%s,%s,%s);",
+                                    (generateLogID(),selectCASending["CurrencyAccountID"],selectCARecieving["CurrencyAccountID"],"Transfer",amounttoconv,datetime.datetime.now(),result)
                                 )
-                                conn.commit()
                                 conn.commit()
                                 cursor.close()
                                 #refresh
@@ -453,6 +452,7 @@ def currencyaccounts():
     if user:
         user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
         currencies = getAllCurrencies()
+        logs = None
         selectedCA = None
         currency = None
         if request.method =="POST":
@@ -481,9 +481,14 @@ def currencyaccounts():
                 selectedCA = getCurrencyAccFromID(raw_selectedCA)
                 if selectedCA:
                     currency = getCurrencyFromID(selectedCA["CurrencyID"])
+                    ##select logs
+                    conn = mysql.connector.connect(**db_config)
+                    cursor = conn.cursor(dictionary=True)
+                    cursor.execute("SELECT * FROM log WHERE Type = \"Transfer\" AND (CurrencyAccountID_Reciever = %s OR CurrencyAccountID_Sender = %s);",(selectedCA["CurrencyAccountID"],selectedCA["CurrencyAccountID"]))
+                    logs = cursor.fetchall()
+                    cursor.close()
 
-
-        return render_template('currencyaccounts.html',user=user,user_CAs = user_CAs,currencies=currencies,selectedCA = selectedCA,currency=currency)
+        return render_template('currencyaccounts.html',user=user,user_CAs = user_CAs,currencies=currencies,selectedCA = selectedCA,currency=currency,logs = logs)
     else:
         return redirect(url_for('home'))
 
