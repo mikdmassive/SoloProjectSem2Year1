@@ -113,32 +113,36 @@ nav ul li :hover {
   font-size: 18px;
   
 }
+.paddedtext{
+  padding-left: 15px;
+  padding-right: 15px;
+}
 .flex{
   display: flex;
-  flex-direction: column;
+  flex-direction: column!important;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
 .flexrow{
   display: flex;
-  flex-direction: row;
+  flex-direction: row!important;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
-.flexrow.spacearound{
-  justify-content: space-around;
+.spacearound{
+  justify-content: space-around!important;
 }
 .right{
-  justify-content: right;
-  align-items: end;
-  text-align: right;
+  justify-content: right !important;
+  align-items: end !important;
+  
 }
 .left{
   justify-content: left;
-  align-items: start;
-  text-align: left;
+  align-items: start!important;
+  text-align: left!important;
 }
 footer {
   background-color: #434343;
@@ -223,6 +227,9 @@ footer {
 }
 .grayBack {
   background-color: rgb(230, 230, 230);
+}
+.redBack {
+  background-color: rgb(250, 154, 154);
 }
 .smalllines p{
   margin-top: 0px;
@@ -350,11 +357,19 @@ tr:first-of-type {
   font-weight: bold;
 }
 form{
-  width: 80%;
+  width: 90%;
   display: flex;
   flex-direction:column;
   align-content: center;
   align-items: center;
+}
+textarea{
+  resize: none;
+  max-width: 100%;
+  min-width: 700px;
+  align-self: center;
+  
+  height: 200px;
 }
 .flash.error{
   text-decoration: none;
@@ -393,8 +408,13 @@ header {
 
 /* Burger Menu Styles */
 @media (max-width:950px) {
+  textarea{
+    width: 100%;
+    min-width: 100%;
+  }
+
   .mobilecollumflex{
-    flex-direction: column;
+    flex-direction: column!important;
   }
   #Logo,
   #logo-img {
@@ -565,6 +585,10 @@ header {
   }
   .BigSection {
     min-width: 400px;
+    
+  }
+  .VeryBigSection {
+    min-width: 600px;
     
   }
   .FullWidth{

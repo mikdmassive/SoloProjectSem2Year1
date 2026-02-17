@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="insidesection grayBack">
-            <h2 class = "underline">Currency Accounts</h2>
+            <h2 class="underline">Currency Accounts</h2>
             <p>Press below to view or create currency accounts.</p>
             <button onclick="location.replace('/currencyaccounts')">View Accounts</button>
 
@@ -90,6 +90,62 @@
             {% endwith %}
             <button type="submit">Add</button>
         </form>
+        {% endif %}
+    </div>
+
+</div>
+<div class="section">
+    <div class="insidesection grayBack">
+        <h2 class="underline">History</h2>
+        <h3 class="underline">Deposits:</h3>
+        {% if depositlogs %}
+            <table>
+                <tr>
+                    <td>Sort Code</td>
+                    <td>Account Number</td>
+                    <td>Amount</td>
+                    <td>Date and Time</td>
+                    <td>Currency Account ID</td>
+                    <td>Currency Account Name</td>
+                </tr>
+                {% for log in depositlogs %}
+                <tr>
+                    <td>{{ log.Reciever_SortCode }}</td>
+                    <td>{{ log.Reciever_AccountNumber }}</td>
+                    <td>{{ log.Symbol }}{{ log.Amount }}</td>
+                    <td>{{ log.TransferDateTime }}</td>
+                    <td>{{ log.CurrencyAccountID }}</td>
+                    <td>{{ log.AccountName }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No history found.</p>
+        {% endif %}
+        <h3 class="underline">Withdrawals:</h3>
+        {% if withdrawallogs %}
+            <table>
+                <tr>
+                    <td>Sort Code</td>
+                    <td>Account Number</td>
+                    <td>Amount</td>
+                    <td>Date and Time</td>
+                    <td>Currency Account ID</td>
+                    <td>Currency Account Name</td>
+                </tr>
+                {% for log in withdrawallogs %}
+                <tr>
+                    <td>{{ log.Reciever_SortCode }}</td>
+                    <td>{{ log.Reciever_AccountNumber }}</td>
+                    <td>{{ log.Symbol }}{{ log.Amount }}</td>
+                    <td>{{ log.TransferDateTime }}</td>
+                    <td>{{ log.CurrencyAccountID }}</td>
+                    <td>{{ log.AccountName }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No history found.</p>
         {% endif %}
     </div>
 

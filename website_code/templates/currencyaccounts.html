@@ -17,7 +17,9 @@
                 <option value="">-- Select an account --</option>
 
                 {% for CA in user_CAs %}
-                <option value="{{ CA.CurrencyAccountID }}">{{ CA.AccountName }} ({{ CA.CurrencyID }})</option>
+                <option value="{{ CA.CurrencyAccountID }}" {% if selectedCA %} {% if
+                    selectedCA.CurrencyAccountID==CA.CurrencyAccountID %} selected {% endif %} {% endif %}>
+                    {{ CA.AccountName }} ({{ CA.CurrencyID }})</option>
                 {% endfor %}
             </select>
             </br>
@@ -47,13 +49,13 @@
                     <p class="roundedbox">{{ currency.Symbol }}{{ selectedCA.Balance }}</p>
                 </div>
             </div>
-            <h3 class ="underline">History:</h3>
+            <h3 class="underline">Transfer History:</h3>
             {% if logs %}
             <table>
                 <tr>
                     <td>Type</td>
                     <td>Amount</td>
-                    <td>Time</td>
+                    <td>Date and Time</td>
                     <td>Sender/Reciever ID</td>
                 </tr>
                 {% for log in logs %}

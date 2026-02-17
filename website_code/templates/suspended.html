@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block description %}
+<meta name="description" content="A page displaying why a user has been Suspended.">{% endblock %}
+
+{% block title %}TransSmart | Suspended{% endblock %}
+{% block java %}{% endblock %}
+{% block content %}
+<div class="section ">
+    <div class="insidesection">
+
+        <h1 class="underline">YOU ARE SUSPENDED</h1>
+        <div class="insidesection redBack">
+            <p class="paddedtext">Your account has been suspended due to suspicious activity. If you would like to
+                appeal, please do so
+                below and member of our team will contact your default email, or an email you specify in your appeal
+                asking to send proof of your source of income. You have every right to request a refund during this
+                process.</p>
+            <form class="insidesection grayBack VeryBigSection">
+                <h3 class="underline">Appeal</h3>
+                <div class= "flexrow mobilecollumflex FullWidth spacearound">
+
+
+                    <div class="flex left">
+                        <label for="appeal" class="FullWidth">Enter Your Appeal Below:</label>
+                        <textarea name="appeal" rows="5" cols="33" maxlength="300" minlength="10"></textarea>
+                    </div>
+                    <button>Send</button>
+                </div>
+            
+            </form>
+                
+            <button onclick="location.replace('/logout')" style="margin-top: 10px;">Log Out</button>
+            
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

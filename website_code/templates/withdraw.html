@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block description %}
+<meta name="description" content="The page to make withdrawals from currency accounts.">{% endblock %}
+
+{% block title %}TransSmart | Withdraw{% endblock %}
+{% block java %}{% endblock %}
+{% block content %}
+<div class="section">
+    <form method="post">
+
+        <div class="insidesection grayBack BigSection FullWidth">
+            <h1 class="underline">Withdraw</h1>
+            <div class="flexrow mobilecollumflex FullWidth spacearound">
+                <div class="insidesection">
+                    <h2 class="underline">Select Currency Account</h2>
+
+                    <label for="selectCA">Currency Account To Withdraw From:</label>
+
+                    <select id="selectCA" name="selectCA">
+                        <option value="">-- Select an account --</option>
+
+                        {% for CA in user_CAs %}
+                        <option value="{{ CA.CurrencyAccountID }}" {% if selectedCA %} {% if
+                            selectedCA.CurrencyAccountID==CA.CurrencyAccountID %} selected {% endif %} {% endif %}>
+                            {{ CA.AccountName }} ({{ CA.CurrencyID }})</option>
+                        {% endfor %}
+                    </select>
+
+                    {% if selectedCA %}
+                    </br>
+
+                    <div class="flex">
+                        <p>Account Balance:</p>
+                        <p class="roundedbox">{{currency.Symbol}}{{ selectedCA.Balance }}</p>
+                    </div>
+                    {% endif %}
+                    </br>
+                    <button type="submit" name="action" value="selectCA">Select</button>
+
+                </div>
+                {% if selectedCA %}
+                <div class="insidesection">
+                    <h2 class="underline">Select Bank Account</h2>
+                    <label for="sortcode">Sort Code</label>
+                    <input type="text" name="sortcode" id="sortcode" value="{{ sortcode }}"></input>
+                    <label for="accountnumber">Account Number</label>
+                    <input type="text" name="accountnumber" id="accountnumber" value="{{ accnum }}"></input>
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password"></input><br />
+
+                    <button type="submit" name="action" value="selectBank">Select</button>
+                    
+                    
+
+                </div>
+                {% endif %}
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+            {% for category, msg in messages %}
+            <div class="flash {{ category }}">
+                {{ msg }}
+            </div>
+            {% endfor %}
+            <br />
+            {% endif %}
+            {% endwith %}
+
+            {% if sortcode and accnum and selectedCA%}
+            <div class="insidesection">
+                <h3 class="underline">Confirm Withdrawal</h3>
+
+                <p>Please select the amount that you want to withdraw:</p>
+                <input type="number" name="amount" step="0.01" value="{{ amounttowithdraw }}" min="5"
+                    max="1000"></input>
+                
+                <p>Withdrawing from the currency account "{{ selectedCA.AccountName }}" into a bank
+                    with:</p>
+                <div class="flex right">
+                    <div class="flexrow right">
+                        <p>Sort Code:</p>
+                        <p class="roundedbox">{{ sortcode }} </p>
+                    </div>
+                    <div class="flexrow right">
+                        <p>Account Number:</p>
+                        <p class="roundedbox">{{ accnum }} </p>
+                    </div>
+                </div>
+                <br />
+                <button type="submit" name="action" value="ConfirmWithdraw">Confirm</button>
+            </div>
+
+
+            {% endif %}
+
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
