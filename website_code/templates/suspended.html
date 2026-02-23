@@ -15,22 +15,51 @@
                 below and member of our team will contact your default email, or an email you specify in your appeal
                 asking to send proof of your source of income. You have every right to request a refund during this
                 process.</p>
-            <form class="insidesection grayBack VeryBigSection">
+            <form class="insidesection grayBack VeryBigSection" method="post">
                 <h3 class="underline">Appeal</h3>
-                <div class= "flexrow mobilecollumflex FullWidth spacearound">
+                {% if alreadyappealed %}
+                <p>You have already sent off an appeal for this suspension.</p>
+                <div class="insidesection VeryBigSection">
+                    <p>In your appeal, you wrote: <br/>"{{ alreadyappealed.Message }}"</p>
+                </div>
+                {% if alreadyappealed.Responce %}
+                 <p>One of our adminstraitors has responded to your appeal.</p>
+                <div class="insidesection VeryBigSection">
+                    <p>"{{ alreadyappealed.Responce }}"</p>
+                </div>
+                {% else %}
+                <p>Please wait for a responce from our adminstraitors.</p>
+
+                {% endif %}
+
+
+                {% else %}
+                <div class="flexrow mobilecollumflex FullWidth spacearound">
 
 
                     <div class="flex left">
                         <label for="appeal" class="FullWidth">Enter Your Appeal Below:</label>
                         <textarea name="appeal" rows="5" cols="33" maxlength="300" minlength="10"></textarea>
                     </div>
-                    <button>Send</button>
+                    <button type="submit">Send</button>
+
                 </div>
-            
+                {% endif %}
+
+                {% with messages = get_flashed_messages(with_categories = true) %}
+                {% if messages %}
+                {% for category, msg in messages %}
+                <div class="flash {{ category }}">
+                    {{ msg }}
+                </div>
+                {% endfor %}
+                <br />
+                {% endif %}
+                {% endwith %}
             </form>
-                
+
             <button onclick="location.replace('/logout')" style="margin-top: 10px;">Log Out</button>
-            
+
         </div>
     </div>
 

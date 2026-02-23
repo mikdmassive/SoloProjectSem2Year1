@@ -64,6 +64,19 @@ def getCurrencyFromID(id):
             return ""
     else:
         return ""
+def getSuspensionAppealFromEmail(email):
+    if email is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM support WHERE Email_Ref = '"+email+"' AND Complete = 0 AND Type = 'SuspensionAppeal';")
+        sus = cursor.fetchone()
+        cursor.close()
+        if sus:
+            return sus
+        else:
+            return ""
+    else:
+        return ""
 def getCurrencyAccFromID(id):
     if id is not None:
         conn = mysql.connector.connect(**db_config)
@@ -82,6 +95,19 @@ def getLogFromID(id):
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM log WHERE LogID = '"+id+"';")
+        log = cursor.fetchone()
+        cursor.close()
+        if log:
+            return log
+        else:
+            return ""
+    else:
+        return ""
+def getSupportFromID(id):
+    if id is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM support WHERE SupportID = '"+id+"';")
         log = cursor.fetchone()
         cursor.close()
         if log:
@@ -145,6 +171,17 @@ def generateLogID():
         numatend = numatend+1
     
     return "Log"+str(numatend)
+def generateSupportID():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM support;")
+    logs = cursor.fetchall()
+    cursor.close()
+    numatend = len(logs)
+    while getSupportFromID("REQ"+str(numatend)):
+        numatend = numatend+1
+    
+    return "REQ"+str(numatend)
 # input validations
 def emailValidChecker(email):
     regExpression_Email = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
@@ -188,8 +225,24 @@ def suspended():
     user = getUserFromEmail(loginChecker())
     if user:
         if isUserSuspended(user):
-            
-            return render_template('suspended.html',user = user)
+            alreadyappealed = getSuspensionAppealFromEmail(user["Email"])
+            if request.method =="POST" and not alreadyappealed:
+                raw_longtext = request.form.get("appeal")
+                print(raw_longtext)
+                if len(raw_longtext)>0:
+                    conn = mysql.connector.connect(**db_config)
+                    cursor = conn.cursor()
+                    statement = "INSERT IGNORE INTO `transsmartdatabase`.`support`(`SupportID`,`Message`,`Response`,`Complete`,`LogIDRef`,`Email_Ref`,`Type`,`TimeRequested`)VALUES(%s,%s,\"Placeholder\",0,null,%s,\"SuspensionAppeal\",%s);"
+                    cursor.execute(
+                        statement,(generateSupportID(),raw_longtext,user["Email"],datetime.datetime.now())
+                    )
+                    conn.commit()
+                    cursor.close()
+                    flash("Appeal Sent!.","confirm")
+                else:
+                    flash("Please Enter Something.","error")
+
+            return render_template('suspended.html',user = user,alreadyappealed=alreadyappealed)
         else:
             return redirect(url_for('home'))
 
@@ -635,47 +688,50 @@ def createaccount():
 def currencyaccounts():
     user = getUserFromEmail(loginChecker())
     if user:
-        user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
-        currencies = getAllCurrencies()
-        logs = None
-        selectedCA = None
-        currency = None
-        if request.method =="POST":
-            action = request.form.get("action")
-            if action == "createCA":
-                accname = request.form["accname"]
-                currencyid_raw = request.form["currencyid"]
-                string_currencyid = currencyid_raw[:3].upper()
-                if getCurrencyFromID(string_currencyid):
-                    if currencyaccountNameValidChecker(accname):
-                        conn = mysql.connector.connect(**db_config)
-                        cursor = conn.cursor()
-                        caID = generateCurrencyAccountID()
-                        cursor.execute(
-                            "INSERT INTO `transsmartdatabase`.`currency_account`(`CurrencyAccountID`,`Email`,`Balance`,`AccountName`,`CurrencyID`) VALUES ('"+caID+"','"+user["Email"]+"',0,'"+accname+"','"+string_currencyid+"');" 
-                        )
-                        conn.commit()
-                        cursor.close()
-                        user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
-                        flash("Currency account created.","confirm")
+        if isUserSuspended(user):
+            return redirect(url_for('suspended'))
+        else:
+            user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
+            currencies = getAllCurrencies()
+            logs = None
+            selectedCA = None
+            currency = None
+            if request.method =="POST":
+                action = request.form.get("action")
+                if action == "createCA":
+                    accname = request.form["accname"]
+                    currencyid_raw = request.form["currencyid"]
+                    string_currencyid = currencyid_raw[:3].upper()
+                    if getCurrencyFromID(string_currencyid):
+                        if currencyaccountNameValidChecker(accname):
+                            conn = mysql.connector.connect(**db_config)
+                            cursor = conn.cursor()
+                            caID = generateCurrencyAccountID()
+                            cursor.execute(
+                                "INSERT INTO `transsmartdatabase`.`currency_account`(`CurrencyAccountID`,`Email`,`Balance`,`AccountName`,`CurrencyID`) VALUES ('"+caID+"','"+user["Email"]+"',0,'"+accname+"','"+string_currencyid+"');" 
+                            )
+                            conn.commit()
+                            cursor.close()
+                            user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
+                            flash("Currency account created.","confirm")
 
+                        else:
+                            flash("Account name invalid.","error")
                     else:
-                        flash("Account name invalid.","error")
-                else:
-                    flash("Currency invalid.","error")
-            elif action == "viewCA":
-                raw_selectedCA = request.form["selectCA"]
-                selectedCA = getCurrencyAccFromID(raw_selectedCA)
-                if selectedCA:
-                    currency = getCurrencyFromID(selectedCA["CurrencyID"])
-                    ##select logs
-                    conn = mysql.connector.connect(**db_config)
-                    cursor = conn.cursor(dictionary=True)
-                    cursor.execute("SELECT * FROM log WHERE Type = \"Transfer\" AND (CurrencyAccountID_Reciever = %s OR CurrencyAccountID_Sender = %s);",(selectedCA["CurrencyAccountID"],selectedCA["CurrencyAccountID"]))
-                    logs = cursor.fetchall()
-                    cursor.close()
+                        flash("Currency invalid.","error")
+                elif action == "viewCA":
+                    raw_selectedCA = request.form["selectCA"]
+                    selectedCA = getCurrencyAccFromID(raw_selectedCA)
+                    if selectedCA:
+                        currency = getCurrencyFromID(selectedCA["CurrencyID"])
+                        ##select logs
+                        conn = mysql.connector.connect(**db_config)
+                        cursor = conn.cursor(dictionary=True)
+                        cursor.execute("SELECT * FROM log WHERE Type = \"Transfer\" AND (CurrencyAccountID_Reciever = %s OR CurrencyAccountID_Sender = %s);",(selectedCA["CurrencyAccountID"],selectedCA["CurrencyAccountID"]))
+                        logs = cursor.fetchall()
+                        cursor.close()
 
-        return render_template('currencyaccounts.html',user=user,user_CAs = user_CAs,currencies=currencies,selectedCA = selectedCA,currency=currency,logs = logs)
+            return render_template('currencyaccounts.html',user=user,user_CAs = user_CAs,currencies=currencies,selectedCA = selectedCA,currency=currency,logs = logs)
     else:
         return redirect(url_for('home'))
 
