@@ -31,29 +31,8 @@ def loginChecker():
     
 def isUserSuspended(user):
     return user["AccessLevel"]==0
-def returnBankNameFromSortCode(sc):
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM bank WHERE SortCode = %s",(sc,))
-    bank = cursor.fetchone()
-    cursor.close()
-    if bank:
-        return bank["BankName"]
-    else:
-        return ""
-def returnBankAcc(an,sc):
-    if an is not None and sc is not None:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM bank_account WHERE SortCode = '"+sc+"' AND AccountNumber = '"+an+"';")
-        bankacc = cursor.fetchone()
-        cursor.close()
-        if bankacc:
-            return bankacc
-        else:
-            return ""
-    else:
-        return ""
+
+
     
 def getCurrencyFromID(id):
     if id is not None:
@@ -687,7 +666,7 @@ def profile():
             return redirect(url_for('suspended'))
         else:
             
-            userbankname = returnBankNameFromSortCode(user["UKBankAcc_SortCode"])
+        
             currency = ""
             ##select logs
             conn = mysql.connector.connect(**db_config)
