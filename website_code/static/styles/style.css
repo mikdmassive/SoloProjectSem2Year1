@@ -1,13 +1,13 @@
 h1,
-h2
-{
+h2 {
   font-weight: bold;
 }
+
 h1,
 h2,
 h3 {
   font-family: Georgia, 'Times New Roman', Times, serif;
-  
+
 }
 
 h1 {
@@ -103,47 +103,54 @@ nav ul li a {
   font-weight: bold;
   text-decoration: none;
   color: #fff;
-  margin:0 auto;
+  margin: 0 auto;
   text-align: center;
   padding: 8px 0;
-  
+
 }
 
 nav ul li :hover {
   font-size: 18px;
-  
+
 }
-.paddedtext{
+
+.paddedtext {
   padding-left: 15px;
   padding-right: 15px;
 }
-.flex{
+
+.flex {
   display: flex;
-  flex-direction: column!important;
+  flex-direction: column !important;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
-.flexrow{
+
+.flexrow {
   display: flex;
-  flex-direction: row!important;
+  flex-direction: row !important;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
-.spacearound{
-  justify-content: space-around!important;
+
+.spacearound {
+  justify-content: space-around !important;
 }
-.right{
+
+.right {
   justify-content: right !important;
   align-items: end !important;
-  
+
 }
-.left{
+
+.left {
   justify-content: left;
-  align-items: start!important;
-  text-align: left!important;
+  align-items: start !important;
+  text-align: left !important;
 }
+
 footer {
   background-color: #434343;
   color: #fff;
@@ -179,7 +186,8 @@ footer {
   border-bottom: 1px solid rgb(220, 220, 220);
   padding-bottom: 10px;
 }
-.roundedbox{
+
+.roundedbox {
   min-width: 100px;
   margin: 8px;
   padding: 10px;
@@ -213,11 +221,11 @@ footer {
 
 }
 
-.insidesection .insidesection h1, 
-.insidesection .insidesection h2, 
+.insidesection .insidesection h1,
+.insidesection .insidesection h2,
 .insidesection .insidesection h3,
 .insidesection .insidesection ul,
-.insidesection .insidesection p{
+.insidesection .insidesection p {
   margin-top: 3px;
   margin-bottom: 3px;
 }
@@ -225,19 +233,29 @@ footer {
 #beigeBack {
   background-color: beige;
 }
+
 .grayBack {
   background-color: rgb(230, 230, 230);
+}
+
+
+
+.greenBack {
+  background-color: rgb(162, 250, 154);
 }
 .redBack {
   background-color: rgb(250, 154, 154);
 }
-.smalllines p{
+
+.smalllines p {
   margin-top: 0px;
   margin-bottom: 0px;
 }
-.underline{
+
+.underline {
   border-bottom: solid 1px black;
 }
+
 #lightblueBack {
   background-color: rgb(220, 245, 240);
 }
@@ -340,11 +358,10 @@ button:hover {
 }
 
 table {
-  width: 100%;
-  max-width: 600px;
   min-width: 300px;
+  width: 100%;
+  font-size: 16px;
 }
-
 th,
 td {
   padding: 10px 4px;
@@ -356,22 +373,25 @@ tr:first-of-type {
   background-color: rgb(244, 244, 244);
   font-weight: bold;
 }
-form{
+
+form {
   width: 90%;
   display: flex;
-  flex-direction:column;
+  flex-direction: column;
   align-content: center;
   align-items: center;
 }
-textarea{
+
+textarea {
   resize: none;
   max-width: 100%;
   min-width: 700px;
   align-self: center;
-  
+
   height: 200px;
 }
-.flash.error{
+
+.flash.error {
   text-decoration: none;
   color: #ff0000;
   font-size: 20px;
@@ -382,7 +402,8 @@ textarea{
   padding-left: 40px;
   padding-right: 10px;
 }
-.flash.confirm{
+
+.flash.confirm {
   text-decoration: none;
   color: #11ff00;
   font-size: 20px;
@@ -393,6 +414,7 @@ textarea{
   padding-left: 40px;
   padding-right: 10px;
 }
+
 header {
   width: 100%;
   position: sticky;
@@ -401,6 +423,7 @@ header {
   border-bottom: 10px solid #797979;
 }
 
+
 #ProfileDiv p {
   color: white;
   font-weight: bold;
@@ -408,14 +431,20 @@ header {
 
 /* Burger Menu Styles */
 @media (max-width:950px) {
-  textarea{
+  textarea {
     width: 100%;
     min-width: 100%;
   }
 
-  .mobilecollumflex{
-    flex-direction: column!important;
+  table {
+
+    font-size: 12px;
   }
+
+  .mobilecollumflex {
+    flex-direction: column !important;
+  }
+
   #Logo,
   #logo-img {
     text-align: left;
@@ -433,19 +462,22 @@ header {
     max-height: 500px;
     overflow: visible;
   }
-  #ProfileDiv.active{
+
+  #ProfileDiv.active {
     max-height: 500px;
     overflow: visible;
   }
-  #ProfileDiv:last-child{
+
+  #ProfileDiv:last-child {
     padding-bottom: 10px;
   }
-  #ProfileDiv{
+
+  #ProfileDiv {
     max-height: 0px;
     overflow: hidden;
   }
-  #ProfileDiv .InlineButtons
-  {
+
+  #ProfileDiv .InlineButtons {
     flex-direction: row;
   }
 
@@ -508,10 +540,15 @@ header {
 
 /* -- DESKTOP --*/
 @media (min-width:950px) {
-  nav ul{
-   
+  .stickyeditor{
+    position: fixed;
+    top: 200px;
+    left: 75px;
+    z-index: 1000;
   }
-  #ProfileDiv{
+  nav ul {}
+
+  #ProfileDiv {
     padding-right: 10%;
   }
 
@@ -583,17 +620,21 @@ header {
     min-width: 400px;
     max-width: 600px;
   }
+
   .BigSection {
     min-width: 400px;
-    
+
   }
+
   .VeryBigSection {
     min-width: 600px;
-    
+
   }
-  .FullWidth{
+
+  .FullWidth {
     width: 100%;
   }
+
   .DesktopSmallerImages {
     max-width: 300px;
   }

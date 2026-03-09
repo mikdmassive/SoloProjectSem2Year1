@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block description %}
+<meta name="description" content="The page used by an administrator.">{% endblock %}
+
+{% block title %}TransSmart | Admin{% endblock %}
+{% block java %}{% endblock %}
+{% block content %}
+<div class="section">
+    <form method="post" class="insidesection grayBack">
+        <h1 class="underline">Admin Screen</h1>
+        <div class="flexrow mobilecollumflex spacearound FullWidth">
+            <div class="insidesection ">
+                <h3 class="underline">Users Editor</h3>
+                <label for="email">Email</label>
+                <input type="text" name="email" id="email" {% if selectedUser %} value="{{ selectedUser.Email }}" {%
+                    endif %}></input>
+                {% with messages = get_flashed_messages(with_categories = true) %}
+                {% if messages %}
+                {% for category, msg in messages %}
+                <br />
+                <div class="flash {{ category }}">
+                    {{ msg }}
+                </div>
+                {% endfor %}
+
+                {% endif %}
+                {% endwith %}
+                <br />
+                <button type="submit" name="action" value="SelectUser">Select</button>
+                {% if selectedUser %}
+                <p>Editing {{ selectedUser.First_Name }} {{ selectedUser.Last_Name }}:</p>
+                <select id="accessLevel" name="accessLevel">
+                    <option value="">-- Select an Access Level --</option>
+
+                    {% for AL in ALs %}
+                    {% if user.AccessLevel-1>= AL.AccessLevel %} <option value="{{ AL.AccessLevel }}">
+                        {{ AL.RoleName }}</option>
+                    {% endif %}
+
+                    {% endfor %}
+                </select>
+                <br />
+                <button type="submit" name="action" value="ConfirmChanges">Confirm</button>
+                {% endif %}
+
+            </div>
+            <div class="insidesection">
+                <h3 class="underline">Suspicious Users</h3>
+                <p>These are users who have attempted to transfer over {{ maxamount }} in any currency within 30 days.
+                </p>
+                {% if sususers %}
+                <Table>
+                    <tr>
+                        <td>Email</td>
+                        <td>Total Transfered Past 30 Days</td>
+                        <td>Suspended?</td>
+                        <td>Approved?</td>
+                    </tr>
+                    {% for sususer in sususers %}
+
+
+                    <tr{% if sususer.Approved == "Yes" %} class="greenBack"  {% elif sususer.AccessLevel !=0 %} class="redBack" {% endif %}>
+                        <td>{{ sususer.Email }}</td>
+                        <td>{{ sususer.TotalTransfered }}</td>
+
+                        {% if sususer.AccessLevel == 0 %}
+                        <td>Yes</td>
+                        {% else %}
+                        <td>No</td>
+                        {% endif %}
+                        
+                        
+                        <td>{{ sususer.Approved }}</td>
+                    </tr>
+                    {% endfor %}
+
+                </Table>
+                {% else %}
+                <p>No suspicious users right now.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="insidesection FullWidth">
+            <h2 class="underline">Appeals</h2>
+           
+
+            <div class="insidesection grayBack FullWidth">
+                  <label for="appealID">Please Enter The ID Of The Appeal To Respond To</label>
+                <input type="text" name="appealID" id="appealID" {% if selectedappeal %} value="{{ selectedappeal.SupportID }}" {%
+                    endif %}></input>
+                    <br/>
+                    <button type="submit" name="action" value="SelectAppeal">Select</button>
+
+                {% if selectedappeal %}
+                <div class="flexrow mobilecollumflex FullWidth spacearound">
+
+
+                    <div class="flex left">
+                        <label for="appealresponce" class="FullWidth">Enter Your Responce Below:</label>
+                        <textarea name="appealresponce" rows="5" cols="33" maxlength="300" minlength="10"></textarea>
+                    </div>
+                    <button type="submit" name="action" value="SendResponce">Send</button>
+
+                </div>
+                {% endif %}
+            </div>
+
+            {% if appeals %}
+            <Table>
+                <tr>
+                    <td>Support ID</td>
+                    <td>Email</td>
+                    <td>Appeal</td>
+
+                </tr>
+                {% for appeal in appeals %}
+
+
+                <tr>
+                    <td>{{ appeal.SupportID }}</td>
+
+                    <td>{{ appeal.Email_Ref }}</td>
+                    <td>{{ appeal.Message }}</td>
+
+                </tr>
+
+                {% endfor %}
+            </Table>
+            {% else %}
+            <p>No appeals right now</p>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% endblock %}

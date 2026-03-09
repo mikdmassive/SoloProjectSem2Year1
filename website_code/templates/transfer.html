@@ -19,21 +19,16 @@
                     <option value="{{ CA.CurrencyAccountID }}" {% if selectCASending %} {% if
                         selectCASending.CurrencyAccountID==CA.CurrencyAccountID %} selected {% endif %} {% endif %}>{{
                         CA.AccountName }} ({{ CA.CurrencyID }})</option>
-
-
                     {% endfor %}
                 </select>
             </div>
             {% if selectCARecieving and selectCASending %}
-
             <button type="submit" name="action" value="QuickSwap">Swap</button>
             {% endif %}
-
             <div class="insidesection">
                 <p>Recieving Currency</p>
                 <select id="selectCARecieving" name="selectCARecieving">
                     <option value="">-- Select an account --</option>
-
                     {% for CA in user_CAs %}
                     <option value="{{ CA.CurrencyAccountID }}" {% if selectCARecieving %} {% if
                         selectCARecieving.CurrencyAccountID==CA.CurrencyAccountID %} selected {% endif %} {% endif %}>{{
@@ -43,7 +38,6 @@
             </div>
         </div>
         <button type="submit" name="action" value="SelectAccounts">Select</button>
-
         {% if selectCARecieving and selectCASending and selectCASendingCurrency and selectCARecievingCurrency %}
         <div class="insidesection">
             <div class="mobilecollumflex flexrow">
@@ -66,8 +60,6 @@
                     <input type="number" name="amount" step="0.01" value="{{ amounttoconv }}" min="1"
                         max="99999999"></input>
                     <button type="submit" name="action" value="SetTransferAmount">Set Amount</button>
-
-
                 </div>
                 <div class="flex">
 
@@ -84,11 +76,9 @@
                         <p class="roundedbox">{{ selectCARecievingCurrency.Symbol }}{{ selectCARecieving.Balance }}</p>
                     </div>
                 </div>
-
             </div>
             {% with messages = get_flashed_messages(with_categories = true) %}
             {% if messages %}
-
             {% for category, msg in messages %}
             <div class="flash {{ category }}">
                 {{ msg }}
@@ -99,12 +89,11 @@
             <div class="insidesection grayBack">
                 <h3 class="underline">Confirm Transfer</h3>
                 <p>Please ensure all details are correct and you have a suffient balance.</p>
-                <p>Converting {{ selectCASendingCurrency.Symbol }}{{ amounttoconv }} from "{{ selectCASending.AccountName }}" into {{ selectCARecievingCurrency.Symbol }}{{ result }} for "{{ selectCARecieving.AccountName }}"</p>
+                <p>Converting {{ selectCASendingCurrency.Symbol }}{{ amounttoconv }} from "{{ selectCASending.AccountName }}"
+                     into {{ selectCARecievingCurrency.Symbol }}{{ result }} for "{{ selectCARecieving.AccountName }}"</p>
                 
                 <button type="submit" name="action" value="ConfirmTransfer">Confirm</button>
-
             </div>
-
         </div>
         {% else %}
         <h3>Please Select a Sending and Recieving currency account</h3>

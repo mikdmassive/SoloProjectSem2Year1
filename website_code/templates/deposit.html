@@ -7,11 +7,9 @@
 {% block content %}
 
 <div class="section">
-
     <div class="insidesection grayBack BigSection">
         <h2 class="underline">Deposit</h2>
         {% if user_CAs %}
-
         <form method="post">
             <label for="selectCA">Please Select An GBP Account To Deposit Into:</label>
 
@@ -24,7 +22,6 @@
                 {% endfor %}
             </select>
             </br>
-
             <button type="submit" name="action" value="selectCA">Select</button>
             {% if selectedCA and  user.UKBankAcc_SortCode and user.UKBankAcc_AccountNumber %}
             <div class="insidesection">
@@ -48,7 +45,6 @@
                 <p>Ensure all details are correct before confirming.</p>
                 {% with messages = get_flashed_messages(with_categories = true) %}
                 {% if messages %}
-
                 {% for category, msg in messages %}
                 <div class="flash {{ category }}">
                     {{ msg }}
@@ -58,15 +54,8 @@
                 {% endwith %}
                 </br>
                 <button type="submit" name="action" value="ConfirmDeposit">Confirm Deposit</button>
-
-
-
                 {% endif %}
-
-
-
             </div>
-
             {% endif %}
         </form>
         {% if not(user.UKBankAcc_SortCode and user.UKBankAcc_AccountNumber) %}
@@ -76,7 +65,6 @@
             <p>You don't have a UK Bank Account linked.</p>
             <p>Please link one using the profile screen.</p>
             <button onclick="location.replace('/profile')">Profile</button>
-
         </div>
         {% endif %}
         {% else %}

@@ -22,13 +22,13 @@
                 <div class="insidesection VeryBigSection">
                     <p>In your appeal, you wrote: <br/>"{{ alreadyappealed.Message }}"</p>
                 </div>
-                {% if alreadyappealed.Responce %}
+                {% if alreadyappealed.Complete == 1 %}
                  <p>One of our adminstraitors has responded to your appeal.</p>
                 <div class="insidesection VeryBigSection">
-                    <p>"{{ alreadyappealed.Responce }}"</p>
+                    <p>"{{ alreadyappealed.Response }}"</p>
                 </div>
                 {% else %}
-                <p>Please wait for a responce from our adminstraitors.</p>
+                <p>Please wait for a response from our adminstraitors.</p>
 
                 {% endif %}
 

@@ -34,33 +34,19 @@
             <h2 class="underline">Currency Accounts</h2>
             <p>Press below to view or create currency accounts.</p>
             <button onclick="location.replace('/currencyaccounts')">View Accounts</button>
-
         </div>
     </div>
-
     <div class="insidesection grayBack">
         <h2 class="underline">UK Bank Account</h2>
         {% if userbankacc and userbankname %}
         <div class="flex right">
             <div class="flexrow">
                 <p>Sort Code:</p>
-                <p class="roundedbox">{{ userbankacc.SortCode }}</p>
+                <p class="roundedbox">{{ user.UKBankAcc_SortCode }}</p>
             </div>
             <div class="flexrow">
                 <p>Account Number:</p>
-                <p class="roundedbox">{{ userbankacc.AccountNumber }}</p>
-            </div>
-            <div class="flexrow">
-                <p>Bank Name:</p>
-                <p class="roundedbox">{{ userbankname }}</p>
-            </div>
-            <div class="flexrow">
-                <p>Name:</p>
-                <p class="roundedbox">{{ userbankacc.First_Name }} {{ userbankacc.Last_Name }}</p>
-            </div>
-            <div class="flexrow">
-                <p>Balance:</p>
-                <p class="roundedbox">{{ currency.Symbol }}{{ userbankacc.Balance }}</p>
+                <p class="roundedbox">{{ user.UKBankAcc_AccountNumber }}</p>
             </div>
         </div>
         <div class="insidesection">
@@ -92,10 +78,9 @@
         </form>
         {% endif %}
     </div>
-
 </div>
 <div class="section">
-    <div class="insidesection grayBack">
+    <div class="insidesection grayBack VeryBigSection">
         <h2 class="underline">History</h2>
         <h3 class="underline">Deposits:</h3>
         {% if depositlogs %}

@@ -1,11 +1,15 @@
 from flask import Flask,redirect,session, render_template,request,url_for,flash
 from config import db_config 
 import mysql.connector
-import hashlib
+from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import re
 from decimal import Decimal,InvalidOperation
 import secrets
+
+maxamount = 10000
+
+
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
@@ -77,6 +81,57 @@ def getSuspensionAppealFromEmail(email):
             return ""
     else:
         return ""
+def getSuspensionAppealResponseFromEmail(email):
+    if email is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM support WHERE Email_Ref = '"+email+"' AND Complete = 1 AND Type = 'SuspensionAppeal' ORDER BY TimeRequested DESC LIMIT 1;")
+        sus = cursor.fetchone()
+        cursor.close()
+        if sus:
+            return sus
+        else:
+            return ""
+    else:
+        return ""
+    
+def hasUserPassedAppeal(email):
+    if email is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM support WHERE Email_Ref = '"+email+"' AND Complete = 2 AND Type = 'SuspensionAppeal' ORDER BY TimeRequested DESC LIMIT 1;")
+        sus = cursor.fetchone()
+        cursor.close()
+        if sus:
+            return sus
+        else:
+            return ""
+    else:
+        return ""
+def getSupportFromID(id):
+    if id is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM support WHERE SupportID = '"+id+"';")
+        sus = cursor.fetchone()
+        cursor.close()
+        if sus:
+            return sus
+        else:
+            return ""
+    else:
+        return ""
+def getAllUnansweredSuspensionAppeals():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM support WHERE Complete = 0 AND Type = 'SuspensionAppeal';")
+    sus = cursor.fetchall()
+    cursor.close()
+    if sus:
+        return sus
+    else:
+        return ""
+    
 def getCurrencyAccFromID(id):
     if id is not None:
         conn = mysql.connector.connect(**db_config)
@@ -90,6 +145,14 @@ def getCurrencyAccFromID(id):
             return ""
     else:
         return ""
+def getSuspiciousUsers():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT U.Email,U.AccessLevel,SUM(L.Amount) as TotalTransfered FROM user U JOIN currency_account CA ON CA.Email = U.Email JOIN log L ON L.CurrencyAccountID_Sender = CA.CurrencyAccountID where L.Type = 'Transfer' and L.TransferDateTime >= NOW()-interval 30 day GROUP BY U.Email HAVING SUM(L.Amount)>"+str(maxamount)+"")
+    sususers = cursor.fetchall()
+    cursor.close()
+    return sususers
+
 def getLogFromID(id):
     if id is not None:
         conn = mysql.connector.connect(**db_config)
@@ -103,6 +166,7 @@ def getLogFromID(id):
             return ""
     else:
         return ""
+
 def getSupportFromID(id):
     if id is not None:
         conn = mysql.connector.connect(**db_config)
@@ -123,6 +187,13 @@ def getAllCurrencies():
     currencies = cursor.fetchall()
     cursor.close()
     return currencies
+def getAllPermissions():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM permissions;")
+    permissions = cursor.fetchall()
+    cursor.close()
+    return permissions
 def getAllCurrencyAccountsFromEmail(email):
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
@@ -219,6 +290,83 @@ def home():
             return render_template('index.html',user = user)
     else:
         return render_template('index.html',user = user)
+@app.route('/admin',methods=["GET","POST"])
+def admin():
+    user = getUserFromEmail(loginChecker())
+    if user:
+        if user["AccessLevel"]>=3:
+            selectedUser = None
+            selectedappeal = None
+            if request.method =="POST":
+                action = request.form.get("action")
+                raw_selectUser = request.form["email"]
+                raw_selectappeal = request.form["appealID"]
+                selectedUser = getUserFromEmail(raw_selectUser)
+                if not selectedUser:
+                    flash("User not found.","error")
+                else:
+                    if action =="ConfirmChanges":
+                        raw_AL = request.form["accessLevel"]
+                        print(raw_AL)
+                        if raw_AL =="0" or  raw_AL =="1" or  raw_AL =="2" or  raw_AL =="3":
+                            conn = mysql.connector.connect(**db_config)
+                            cursor = conn.cursor()
+                            statement = "UPDATE `transsmartdatabase`.`user` SET `AccessLevel` = %s WHERE `Email`= %s;"
+                            cursor.execute(
+                                statement,(raw_AL,selectedUser["Email"])
+                            )
+                            maybesupport = None
+                            if getSuspensionAppealFromEmail(selectedUser["Email"]):
+                                maybesupport = getSuspensionAppealFromEmail(selectedUser["Email"])["SupportID"]
+                            if getSuspensionAppealResponseFromEmail(selectedUser["Email"]):
+                                maybesupport = getSuspensionAppealResponseFromEmail(selectedUser["Email"])["SupportID"]
+                            if maybesupport is not None and (raw_AL =="1" or  raw_AL =="2" or  raw_AL =="3"):
+                                statement = "UPDATE `transsmartdatabase`.`support` SET `Complete` = %s WHERE `SupportID`= %s;"
+                                cursor.execute(
+                                    statement,(2,maybesupport)
+                                )
+        
+                            conn.commit()
+                            cursor.close() 
+                        else:
+                            flash("Select a valid access level.","error")
+                if action == "SelectAppeal" or action == "SendResponce":
+                    if getSupportFromID(raw_selectappeal):
+                        selectedappeal = getSupportFromID(raw_selectappeal)
+                        if action == "SendResponce":
+                            raw_longtext = request.form.get("appealresponce")
+                            print(raw_longtext)
+                            if len(raw_longtext)>0 and selectedappeal["Type"] == "SuspensionAppeal":
+                                conn = mysql.connector.connect(**db_config)
+                                cursor = conn.cursor()
+                                statement = "UPDATE `transsmartdatabase`.`support` SET `Response` = %s,`Complete` = 1 WHERE `SupportID`= %s;"
+                                cursor.execute(
+                                    statement,(raw_longtext,selectedappeal["SupportID"])
+                                )
+                                
+                                conn.commit()
+                                cursor.close()
+                    
+
+            ALs = getAllPermissions()
+            sususers = getSuspiciousUsers()
+            appeals = getAllUnansweredSuspensionAppeals()
+            
+            for sususer in sususers:
+                approved = "No"
+                if hasUserPassedAppeal(sususer["Email"]):
+                    approved = "Yes"
+                sususer["Approved"] = approved
+
+                    
+                    
+            return render_template('admin.html',user = user,appeals=appeals,selectedappeal = selectedappeal,sususers = sususers,maxamount = maxamount,selectedUser=selectedUser,ALs=ALs)
+        else:
+            return redirect(url_for('home'))
+
+    else:
+        return redirect(url_for('home'))
+
 
 @app.route('/suspended',methods=["GET","POST"])
 def suspended():
@@ -226,6 +374,9 @@ def suspended():
     if user:
         if isUserSuspended(user):
             alreadyappealed = getSuspensionAppealFromEmail(user["Email"])
+            susresponce =  getSuspensionAppealResponseFromEmail(user["Email"])
+            if not alreadyappealed and susresponce:
+                alreadyappealed = susresponce
             if request.method =="POST" and not alreadyappealed:
                 raw_longtext = request.form.get("appeal")
                 print(raw_longtext)
@@ -238,11 +389,16 @@ def suspended():
                     )
                     conn.commit()
                     cursor.close()
-                    flash("Appeal Sent!.","confirm")
+                    flash("Appeal Sent!","confirm")
+                    alreadyappealed = getSuspensionAppealFromEmail(user["Email"])
+                    susresponce =  getSuspensionAppealResponseFromEmail(user["Email"])
+                    if not alreadyappealed and susresponce:
+                        alreadyappealed = susresponce
                 else:
                     flash("Please Enter Something.","error")
-
-            return render_template('suspended.html',user = user,alreadyappealed=alreadyappealed)
+            print(alreadyappealed)
+            print(susresponce)
+            return render_template('suspended.html',user = user,alreadyappealed=alreadyappealed,susresponce=susresponce)
         else:
             return redirect(url_for('home'))
 
@@ -478,49 +634,49 @@ def transfer():
 @app.route('/exchange_rates',methods=["GET","POST"])
 def exchange_rates():
     user = getUserFromEmail(loginChecker())
-    if isUserSuspended(user):
-        return redirect(url_for('suspended'))
-    else:
-        currencies = getAllCurrencies()
-        result = None
-        fromcurrency = ""
-        tocurrency = ""
-        amounttoconv = 1
-        amountdisplay = amounttoconv
-        if request.method =="POST":
-            raw_from= request.form["refcurrency"]
-            raw_to = request.form["transfercurrency"]
-            raw_amount = request.form.get("amount", "").strip()
-            string_fromcurrency = raw_from[:3].upper()
-            string_tocurrency = raw_to[:3].upper()
-            fromcurrency = getCurrencyFromID(string_fromcurrency)
-            tocurrency = getCurrencyFromID(string_tocurrency)
-            if  (fromcurrency and tocurrency):
-                try:
-                    amounttoconv = Decimal(raw_amount)
-                except (InvalidOperation,ValueError):
-                    flash("Amount invalid, setting to 1.","error")
-                    amounttoconv = 1
+    if user:
+        if isUserSuspended(user):
+            return redirect(url_for('suspended'))
+    
+    currencies = getAllCurrencies()
+    result = None
+    fromcurrency = ""
+    tocurrency = ""
+    amounttoconv = 1
+    amountdisplay = amounttoconv
+    if request.method =="POST":
+        raw_from= request.form["refcurrency"]
+        raw_to = request.form["transfercurrency"]
+        raw_amount = request.form.get("amount", "").strip()
+        string_fromcurrency = raw_from[:3].upper()
+        string_tocurrency = raw_to[:3].upper()
+        fromcurrency = getCurrencyFromID(string_fromcurrency)
+        tocurrency = getCurrencyFromID(string_tocurrency)
+        if  (fromcurrency and tocurrency):
+            try:
+                amounttoconv = Decimal(raw_amount)
+            except (InvalidOperation,ValueError):
+                flash("Amount invalid, setting to 1.","error")
+                amounttoconv = 1
+            ratesmap = {c["CurrencyID"]:c["ValueAgainstPound"] for c in currencies}
 
-                ratesmap = {c["CurrencyID"]:c["ValueAgainstPound"] for c in currencies}
-
-                ##maths would want 
-                fromcurrency_OnePound = ratesmap[string_fromcurrency]
-                result = fromcurrency_OnePound/ratesmap[string_tocurrency]
-                result= (result*amounttoconv)
-                min_amnt = Decimal("0.0000001")
-                amountdisplay = formatConversion((amounttoconv.quantize(min_amnt)))
-                if result<min_amnt:
-                    result= f<"{min_amnt}"
-                else:
-                    result = formatConversion((result.quantize(min_amnt)))
+            ##maths would want 
+            fromcurrency_OnePound = ratesmap[string_fromcurrency]
+            result = fromcurrency_OnePound/ratesmap[string_tocurrency]
+            result= (result*amounttoconv)
+            min_amnt = Decimal("0.0000001")
+            amountdisplay = formatConversion((amounttoconv.quantize(min_amnt)))
+            if result<min_amnt:
+                result= f<"{min_amnt}"
+            else:
+                result = formatConversion((result.quantize(min_amnt)))
                     
                 
 
-            else:
-                flash("Currencies invalid.","error")
+        else:
+            flash("Currencies invalid.","error")
 
-        return render_template('exchange_rates.html',user=user,result=result,fromcurrency=fromcurrency,tocurrency=tocurrency,currencies=currencies,amounttoconv=amounttoconv,amountdisplay = amountdisplay)
+    return render_template('exchange_rates.html',user=user,result=result,fromcurrency=fromcurrency,tocurrency=tocurrency,currencies=currencies,amounttoconv=amounttoconv,amountdisplay = amountdisplay)
 
 
 @app.route('/profile',methods=["GET","POST"])
@@ -530,7 +686,7 @@ def profile():
         if isUserSuspended(user):
             return redirect(url_for('suspended'))
         else:
-            userbankacc = returnBankAcc(user["UKBankAcc_AccountNumber"],user["UKBankAcc_SortCode"])
+            
             userbankname = returnBankNameFromSortCode(user["UKBankAcc_SortCode"])
             currency = ""
             ##select logs
@@ -553,38 +709,36 @@ def profile():
             
             print(depositlogs)
             cursor.close()
-            if userbankacc:
-                currency = getCurrencyFromID(userbankacc["CurrencyID"])
+           
             if request.method =="POST":
                 accountnumber = request.form["accountnumber"]
                 sortcode = request.form["sortcode"]
                 password = request.form["password"]
-                bankacc = returnBankAcc(accountnumber,sortcode)
+               
                 
 
-                if bankacc:
-                    if bankacc["CurrencyID"] == "GBP":
-                        if password == bankacc["Password"]:
-                            conn = mysql.connector.connect(**db_config)
-                            cursor = conn.cursor()
-                            cursor.execute(
-                                "UPDATE `transsmartdatabase`.`user` SET `UKBankAcc_AccountNumber` = %s , `UKBankAcc_SortCode` = %s WHERE `Email`= %s;",
-                                (accountnumber,sortcode,user["Email"])
-                            )
-                            conn.commit()
-                            cursor.close()
-                            return redirect(url_for('profile'))
-
-                        else:
-                            flash("Incorrect password.","error")
-                            
+                if sortcodeValidChecker(sortcode):
+                    if accountnumberValidChecker(accountnumber):
+                    
+                        conn = mysql.connector.connect(**db_config)
+                        cursor = conn.cursor()
+                        cursor.execute(
+                            "UPDATE `transsmartdatabase`.`user` SET `UKBankAcc_AccountNumber` = %s , `UKBankAcc_SortCode` = %s WHERE `Email`= %s;",
+                            (accountnumber,sortcode,user["Email"])
+                        )
+                        conn.commit()
+                        cursor.close()
+                        return redirect(url_for('profile'))
                     else:
-                        flash("The currency in this account is not GBP.","error")
-                        
+                        flash("Invalid Account Number Format","error")
                 else:
-                    flash("Bank Account not found.","error")
+                    flash("Invalid Sort Code Format","error")
+                    
+                           
 
-            return render_template('profile.html',user=user,userbankacc = userbankacc,userbankname=userbankname,currency=currency,depositlogs=depositlogs,withdrawallogs=withdrawallogs)
+                     
+
+            return render_template('profile.html',user=user,depositlogs=depositlogs,withdrawallogs=withdrawallogs)
     else:
         return redirect(url_for('home'))
 @app.route('/removebankaccount')
@@ -630,7 +784,7 @@ def login():
             user = cursor.fetchone()
             cursor.close()
             if user:
-                if password == user[1]:
+                if check_password_hash(user[1],password):
                     session["user_email"] = user[0]
                     return redirect(url_for('home'))
                 else:
@@ -663,7 +817,7 @@ def createaccount():
                             conn = mysql.connector.connect(**db_config)
                             cursor = conn.cursor()
                             cursor.execute(
-                                "INSERT IGNORE INTO `transsmartdatabase`.`user`(`Email`,`First_Name`,`Last_Name`,`UKBankAcc_AccountNumber`,`UKBankAcc_SortCode`,`Password`,`AccessLevel`) VALUES ('"+email+"','"+fname+"','"+lname+"',null,null,'"+password+"',1);"
+                                "INSERT IGNORE INTO `transsmartdatabase`.`user`(`Email`,`First_Name`,`Last_Name`,`UKBankAcc_AccountNumber`,`UKBankAcc_SortCode`,`Password`,`AccessLevel`) VALUES ('"+email+"','"+fname+"','"+lname+"',null,null,'"+generate_password_hash(password)+"',1);"
                             )
                             conn.commit()
                             cursor.close()

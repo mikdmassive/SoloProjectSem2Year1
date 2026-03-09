@@ -7,28 +7,22 @@
 {% block content %}
 <div class="section">
     <form method="post">
-
         <div class="insidesection grayBack BigSection FullWidth">
             <h1 class="underline">Withdraw</h1>
             <div class="flexrow mobilecollumflex FullWidth spacearound">
                 <div class="insidesection">
                     <h2 class="underline">Select Currency Account</h2>
-
                     <label for="selectCA">Currency Account To Withdraw From:</label>
-
                     <select id="selectCA" name="selectCA">
                         <option value="">-- Select an account --</option>
-
                         {% for CA in user_CAs %}
                         <option value="{{ CA.CurrencyAccountID }}" {% if selectedCA %} {% if
                             selectedCA.CurrencyAccountID==CA.CurrencyAccountID %} selected {% endif %} {% endif %}>
                             {{ CA.AccountName }} ({{ CA.CurrencyID }})</option>
                         {% endfor %}
                     </select>
-
                     {% if selectedCA %}
                     </br>
-
                     <div class="flex">
                         <p>Account Balance:</p>
                         <p class="roundedbox">{{currency.Symbol}}{{ selectedCA.Balance }}</p>
@@ -36,7 +30,6 @@
                     {% endif %}
                     </br>
                     <button type="submit" name="action" value="selectCA">Select</button>
-
                 </div>
                 {% if selectedCA %}
                 <div class="insidesection">
@@ -47,15 +40,10 @@
                     <input type="text" name="accountnumber" id="accountnumber" value="{{ accnum }}"></input>
                     <label for="password">Password</label>
                     <input type="password" name="password" id="password"></input><br />
-
                     <button type="submit" name="action" value="selectBank">Select</button>
-                    
-                    
-
                 </div>
                 {% endif %}
             </div>
-
             {% with messages = get_flashed_messages(with_categories = true) %}
             {% if messages %}
             {% for category, msg in messages %}
@@ -66,11 +54,9 @@
             <br />
             {% endif %}
             {% endwith %}
-
             {% if sortcode and accnum and selectedCA%}
             <div class="insidesection">
                 <h3 class="underline">Confirm Withdrawal</h3>
-
                 <p>Please select the amount that you want to withdraw:</p>
                 <input type="number" name="amount" step="0.01" value="{{ amounttowithdraw }}" min="5"
                     max="1000"></input>
@@ -90,12 +76,9 @@
                 <br />
                 <button type="submit" name="action" value="ConfirmWithdraw">Confirm</button>
             </div>
-
-
             {% endif %}
 
         </div>
-
     </form>
 </div>
 
