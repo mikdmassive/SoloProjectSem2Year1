@@ -139,10 +139,13 @@ nav ul li :hover {
   justify-content: space-around !important;
 }
 
+.flextop {
+  justify-content: flex-start !important;
+}
+
 .right {
   justify-content: right !important;
   align-items: end !important;
-
 }
 
 .left {
@@ -405,9 +408,9 @@ textarea {
 
 .flash.confirm {
   text-decoration: none;
-  color: #11ff00;
+  color: #065b00;
   font-size: 20px;
-  background-color: rgba(0, 255, 0, 0.231);
+  background-color: rgba(0, 244, 0, 0.231);
   background-image: url('/static/images/tick.png');
   background-repeat: no-repeat;
   background-position: 5px 2.5px;
@@ -549,7 +552,7 @@ header {
   nav ul {}
 
   #ProfileDiv {
-    padding-right: 10%;
+    padding-right: 5%;
   }
 
   .InlineButtons {
@@ -633,6 +636,10 @@ header {
 
   .FullWidth {
     width: 100%;
+  }
+  .FullHeight {
+    height: 100% !important;
+  
   }
 
   .DesktopSmallerImages {

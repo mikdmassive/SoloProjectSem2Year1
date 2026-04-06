@@ -6,11 +6,9 @@
 {% block java %}{% endblock %}
 {% block content %}
 <div class="section">
-
     <div class="insidesection grayBack">
         <h2 class="underline">Your Currency Accounts</h2>
         {% if user_CAs %}
-
         <form method="post">
 
             <select id="selectCA" name="selectCA">
@@ -23,7 +21,6 @@
                 {% endfor %}
             </select>
             </br>
-
             <button type="submit" name="action" value="viewCA">Select</button>
         </form>
         </br>
@@ -141,7 +138,6 @@
             {% endwith %}
             </br>
             <button type="submit" name="action" value="createCA">Create Account</button>
-
         </form>
     </div>
 

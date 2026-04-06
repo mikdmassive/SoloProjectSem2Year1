@@ -346,6 +346,16 @@ def admin():
     else:
         return redirect(url_for('home'))
 
+@app.route('/support',methods=["GET","POST"])
+def support():
+    user = getUserFromEmail(loginChecker())
+    if user:
+        if user["AccessLevel"]>=2:
+        
+            return render_template('support.html',user = user)
+        else:
+            return redirect(url_for('home'))
+
 
 @app.route('/suspended',methods=["GET","POST"])
 def suspended():
@@ -690,31 +700,48 @@ def profile():
             cursor.close()
            
             if request.method =="POST":
-                accountnumber = request.form["accountnumber"]
-                sortcode = request.form["sortcode"]
-                password = request.form["password"]
-               
+                action = request.form.get("action")
+                if action == "Bank":
+                    accountnumber = request.form["accountnumber"]
+                    sortcode = request.form["sortcode"]
+                    password = request.form["password"]
                 
-
-                if sortcodeValidChecker(sortcode):
-                    if accountnumberValidChecker(accountnumber):
                     
+
+                    if sortcodeValidChecker(sortcode):
+                        if accountnumberValidChecker(accountnumber):
+                        
+                            conn = mysql.connector.connect(**db_config)
+                            cursor = conn.cursor()
+                            cursor.execute(
+                                "UPDATE `transsmartdatabase`.`user` SET `UKBankAcc_AccountNumber` = %s , `UKBankAcc_SortCode` = %s WHERE `Email`= %s;",
+                                (accountnumber,sortcode,user["Email"])
+                            )
+                            conn.commit()
+                            cursor.close()
+                            return redirect(url_for('profile'))
+                        else:
+                            flash("Invalid Account Number Format","error")
+                    else:
+                        flash("Invalid Sort Code Format","error")
+                elif action =="Support":
+                    raw_longtext = request.form.get("appeal")
+                    print(raw_longtext)
+                    if len(raw_longtext)>0:
+                        print("valid")
+                        raw_logid = request.form.get("tref")
+                        logid = "null"
+                        if getLogFromID(raw_logid):
+                            logid = "\""+raw_logid+"\""
                         conn = mysql.connector.connect(**db_config)
                         cursor = conn.cursor()
+                        statement = "INSERT IGNORE INTO `transsmartdatabase`.`support`(`SupportID`,`Message`,`Response`,`Complete`,`LogIDRef`,`Email_Ref`,`Type`,`TimeRequested`)VALUES(%s,%s,\"Placeholder\",0,"+logid+",%s,\"SupportRequest\",%s);"
                         cursor.execute(
-                            "UPDATE `transsmartdatabase`.`user` SET `UKBankAcc_AccountNumber` = %s , `UKBankAcc_SortCode` = %s WHERE `Email`= %s;",
-                            (accountnumber,sortcode,user["Email"])
+                            statement,(generateSupportID(),raw_longtext,user["Email"],datetime.datetime.now())
                         )
                         conn.commit()
                         cursor.close()
-                        return redirect(url_for('profile'))
-                    else:
-                        flash("Invalid Account Number Format","error")
-                else:
-                    flash("Invalid Sort Code Format","error")
-                    
-                           
-
+                        flash("Support Sent!","confirm")
                      
 
             return render_template('profile.html',user=user,depositlogs=depositlogs,withdrawallogs=withdrawallogs)

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block description %}
+<meta name="description" content="The page used by an customer support member to reply to a customer inquiry.">{% endblock %}
+
+{% block title %}TransSmart | Support{% endblock %}
+{% block java %}{% endblock %}
+{% block content %}
+<div class="section">
+    <form method="post" class="insidesection grayBack">
+        <h1 class="underline">Support Screen</h1>
+        <div class="insidesection FullWidth">
+            <h2 class="underline">Appeals</h2>
+           
+
+            <div class="insidesection grayBack FullWidth">
+                  <label for="appealID">Please Enter The ID Of The Appeal To Respond To</label>
+                <input type="text" name="appealID" id="appealID" {% if selectedappeal %} value="{{ selectedappeal.SupportID }}" {%
+                    endif %}></input>
+                    <br/>
+                    <button type="submit" name="action" value="SelectAppeal">Select</button>
+
+                {% if selectedappeal %}
+                <div class="flexrow mobilecollumflex FullWidth spacearound">
+
+
+                    <div class="flex left">
+                        <label for="appealresponce" class="FullWidth">Enter Your Responce Below:</label>
+                        <textarea name="appealresponce" rows="5" cols="33" maxlength="300" minlength="10"></textarea>
+                    </div>
+                    <button type="submit" name="action" value="SendResponce">Send</button>
+
+                </div>
+                {% endif %}
+            </div>
+
+            {% if appeals %}
+            <Table>
+                <tr>
+                    <td>Support ID</td>
+                    <td>Email</td>
+                    <td>Appeal</td>
+
+                </tr>
+                {% for appeal in appeals %}
+
+
+                <tr>
+                    <td>{{ appeal.SupportID }}</td>
+
+                    <td>{{ appeal.Email_Ref }}</td>
+                    <td>{{ appeal.Message }}</td>
+
+                </tr>
+
+                {% endfor %}
+            </Table>
+            {% else %}
+            <p>No appeals right now</p>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% endblock %}

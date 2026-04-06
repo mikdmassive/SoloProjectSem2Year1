@@ -32,13 +32,16 @@
                     <li><a href="{{url_for('transfer')}}">Transfer Funds</a></li>
                     <li><a href="{{url_for('withdraw')}}">Withdraw</a></li>
                     <li><a href="{{url_for('deposit')}}">Deposit</a></li>
-                     {% if user %} 
-                    {% if user.AccessLevel>=3 %}
-                    <li><a href="{{url_for('admin')}}">Admin</a></li>
+                    {% if user %} 
+                        {% if user.AccessLevel>=2 %}
+                            <li><a href="{{url_for('support')}}">Support</a></li>
+                        {% endif %}
                     {% endif %}
-
+                    {% if user %} 
+                        {% if user.AccessLevel>=3 %}
+                            <li><a href="{{url_for('admin')}}">Admin</a></li>
+                        {% endif %}
                     {% endif %}
-                    
                 </ul>
             </nav>
             <div id="ProfileDiv">
