@@ -111,6 +111,17 @@ def getAllUnansweredSuspensionAppeals():
     else:
         return ""
     
+def getAllUnansweredSupportRequests():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM support WHERE Complete = 0 AND Type = 'SupportRequest';")
+    supreqs = cursor.fetchall()
+    cursor.close()
+    if supreqs:
+        return supreqs
+    else:
+        return ""
+    
 def getCurrencyAccFromID(id):
     if id is not None:
         conn = mysql.connector.connect(**db_config)
@@ -351,8 +362,50 @@ def support():
     user = getUserFromEmail(loginChecker())
     if user:
         if user["AccessLevel"]>=2:
-        
-            return render_template('support.html',user = user)
+            selectedsupportreq = None
+            selectedlog = None
+            if request.method =="POST":
+                action = request.form.get("action")
+                raw_selectsupportID = request.form["supportID"]
+                if action == "SelectSupport" or  action == "SendResponce":
+                    if getSupportFromID(raw_selectsupportID):
+                        if getSupportFromID(raw_selectsupportID)["Type"] == "SupportRequest" and getSupportFromID(raw_selectsupportID)["Complete"]==0:
+                            selectedsupportreq = getSupportFromID(raw_selectsupportID)
+                            if getLogFromID(selectedsupportreq["LogIDRef"]):
+                                selectedlog = getLogFromID(selectedsupportreq["LogIDRef"])
+                                conn = mysql.connector.connect(**db_config)
+                                cursor = conn.cursor(dictionary=True)
+                                if selectedlog["Type"] =="Deposit" or  selectedlog["Type"] =="Withdrawal":
+                                    ##select logs
+                                    cursor.execute(
+                                        "SELECT * FROM log INNER JOIN currency_account ON log.CurrencyAccountID_Sender = currency_account.CurrencyAccountID INNER JOIN currency ON currency_account.CurrencyID = currency.CurrencyID WHERE log.LogID = %s;",
+                                        (selectedlog["LogID"],)
+                                    )
+                                    selectedlog = cursor.fetchone()
+                                conn.close()
+                            if action == "SendResponce":
+                                raw_longtext = request.form.get("supportresponce")
+                                print(raw_longtext)
+                                if len(raw_longtext)>0:
+                                    conn = mysql.connector.connect(**db_config)
+                                    cursor = conn.cursor()
+                                    statement = "UPDATE `transsmartdatabase`.`support` SET `Response` = %s,`Complete` = 1 WHERE `SupportID`= %s;"
+                                    cursor.execute(
+                                        statement,(raw_longtext,selectedsupportreq["SupportID"])
+                                    )
+                                    
+                                    conn.commit()
+                                    cursor.close()
+                                    flash("Responce Sent!","confirm")
+                                    selectedsupportreq = None
+                                    selectedlog = None
+
+
+
+                    
+                    
+            supportrequests = getAllUnansweredSupportRequests()
+            return render_template('support.html',user = user,supportrequests=supportrequests,selectedsupportreq=selectedsupportreq,selectedlog=selectedlog)
         else:
             return redirect(url_for('home'))
 
@@ -725,7 +778,7 @@ def profile():
                     else:
                         flash("Invalid Sort Code Format","error")
                 elif action =="Support":
-                    raw_longtext = request.form.get("appeal")
+                    raw_longtext = request.form.get("inquiry")
                     print(raw_longtext)
                     if len(raw_longtext)>0:
                         print("valid")
@@ -741,7 +794,7 @@ def profile():
                         )
                         conn.commit()
                         cursor.close()
-                        flash("Support Sent!","confirm")
+                        flash("Support Request Sent!","confirm")
                      
 
             return render_template('profile.html',user=user,depositlogs=depositlogs,withdrawallogs=withdrawallogs)

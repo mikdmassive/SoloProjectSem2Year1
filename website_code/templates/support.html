@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block description %}
-<meta name="description" content="The page used by an customer support member to reply to a customer inquiry.">{% endblock %}
+<meta name="description" content="The page used by an customer support member to reply to a customer inquiry.">{%
+endblock %}
 
 {% block title %}TransSmart | Support{% endblock %}
 {% block java %}{% endblock %}
@@ -10,30 +11,77 @@
         <h1 class="underline">Support Screen</h1>
         <div class="insidesection FullWidth">
             <h2 class="underline">Appeals</h2>
-           
+
 
             <div class="insidesection grayBack FullWidth">
-                  <label for="appealID">Please Enter The ID Of The Appeal To Respond To</label>
-                <input type="text" name="appealID" id="appealID" {% if selectedappeal %} value="{{ selectedappeal.SupportID }}" {%
-                    endif %}></input>
-                    <br/>
-                    <button type="submit" name="action" value="SelectAppeal">Select</button>
+                <label for="supportID">Please Enter The ID Of The Appeal To Respond To</label>
+                <input type="text" name="supportID" id="supportID" {% if selectedsupportreq %}
+                    value="{{ selectedsupportreq.SupportID }}" {% endif %}></input>
+                <br />
+                {% with messages = get_flashed_messages(with_categories = true) %}
+                {% if messages %}
+                {% for category, msg in messages %}
+                {% if category == "confirm" %}
+                <div class="flash {{ category }}">
+                    {{ msg }}
+                </div>
+                {% endif %}
 
-                {% if selectedappeal %}
-                <div class="flexrow mobilecollumflex FullWidth spacearound">
-
-
-                    <div class="flex left">
-                        <label for="appealresponce" class="FullWidth">Enter Your Responce Below:</label>
-                        <textarea name="appealresponce" rows="5" cols="33" maxlength="300" minlength="10"></textarea>
+                {% endfor %}
+                <br />
+                {% endif %}
+                {% endwith %}
+                <button type="submit" name="action" value="SelectSupport">Select</button>
+                {% if selectedsupportreq %}
+                <div class="insidesection FullWidth">
+                    <h3 class="underline">Support Request Information</h3>
+                    <div class="insidesection VeryBigSection">
+                        <h4 class="underline">Support Message</h4>
+                        <p>"{{ selectedsupportreq.Message }}"</p>
                     </div>
-                    <button type="submit" name="action" value="SendResponce">Send</button>
+                    {% if selectedlog %}
 
+                    <div class="insidesection VeryBigSection">
+                        <h4 class="underline">Transaction Information</h4>
+                        {% if selectedlog.Type == "Withdrawal" %}
+                        <p>This support request references a transaction which was a <b>Withdrawal</b></p>
+                        <table>
+                            <tr>
+                                <td>Sort Code</td>
+                                <td>Account Number</td>
+                                <td>Amount</td>
+                                <td>Date and Time</td>
+                                <td>Currency Account ID</td>
+                                <td>Currency Account Name</td>
+                            </tr>
+                            <tr>
+                                <td>{{ selectedlog.Reciever_SortCode }}</td>
+                                <td>{{ selectedlog.Reciever_AccountNumber }}</td>
+                                <td>{{ selectedlog.Symbol }}{{ selectedlog.Amount }}</td>
+                                <td>{{ selectedlog.TransferDateTime }}</td>
+                                <td>{{ selectedlog.CurrencyAccountID }}</td>
+                                <td>{{ selectedlog.AccountName }}</td>
+                            </tr>
+                        </table>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="flexrow mobilecollumflex FullWidth spacearound">
+
+
+                        <div class="flex left">
+                            <label for="supportresponce" class="FullWidth">Enter Your Responce Below:</label>
+                            <textarea name="supportresponce" rows="5" cols="33" maxlength="300"
+                                minlength="10"></textarea>
+                        </div>
+                        <button type="submit" name="action" value="SendResponce">Send</button>
+
+                    </div>
                 </div>
                 {% endif %}
             </div>
 
-            {% if appeals %}
+            {% if supportrequests %}
             <Table>
                 <tr>
                     <td>Support ID</td>
@@ -41,21 +89,21 @@
                     <td>Appeal</td>
 
                 </tr>
-                {% for appeal in appeals %}
+                {% for supportrequest in supportrequests %}
 
 
                 <tr>
-                    <td>{{ appeal.SupportID }}</td>
+                    <td>{{ supportrequest.SupportID }}</td>
 
-                    <td>{{ appeal.Email_Ref }}</td>
-                    <td>{{ appeal.Message }}</td>
+                    <td>{{ supportrequest.Email_Ref }}</td>
+                    <td>{{ supportrequest.Message }}</td>
 
                 </tr>
 
                 {% endfor %}
             </Table>
             {% else %}
-            <p>No appeals right now</p>
+            <p>No requests right now</p>
             {% endif %}
         </div>
     </form>

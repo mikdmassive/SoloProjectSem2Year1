@@ -67,9 +67,12 @@
             {% with messages = get_flashed_messages(with_categories = true) %}
             {% if messages %}
             {% for category, msg in messages %}
+            {% if category == "error" %}
             <div class="flash {{ category }}">
                 {{ msg }}
             </div>
+            {% endif %}
+
             {% endfor %}
             <br />
             {% endif %}
@@ -78,24 +81,39 @@
         </form>
         {% endif %}
     </div>
-    
+
 </div>
-<div class = "section">
+<div class="section">
     <div class="insidesection">
         <h2 class="underline">Support</h2>
         <form class="flex" method="post">
+            {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+            {% for category, msg in messages %}
+            {% if category == "confirm" %}
+            <div class="flash {{ category }}">
+                {{ msg }}
+            </div>
+            {% endif %}
+
+            {% endfor %}
+            <br />
+            {% endif %}
+            {% endwith %}
             <div class="insidesection grayBack BigSection">
+
                 <div class="flex FullWidth">
-                    <label for="tref">Transaction Reference ID(Optional)</label>
+                    <label for="tref">Transaction ID(Optional)</label>
                     <input type="text" name="tref" id="tref"></input>
                 </div>
             </div>
-            
+
             <div class="flex left insidesection grayBack">
                 <label for="inquiry" class="FullWidth">Enter your inquiry below:</label>
                 <textarea name="inquiry" rows="5" cols="33" maxlength="300" minlength="10"></textarea>
             </div>
             <button type="submit" name="action" value="Support">Send</button>
+
         </form>
     </div>
 </div>
@@ -106,6 +124,7 @@
         {% if depositlogs %}
         <table>
             <tr>
+                <td>Transaction ID</td>
                 <td>Sort Code</td>
                 <td>Account Number</td>
                 <td>Amount</td>
@@ -115,6 +134,7 @@
             </tr>
             {% for log in depositlogs %}
             <tr>
+                <td>{{ log.LogID }}</td>
                 <td>{{ log.Reciever_SortCode }}</td>
                 <td>{{ log.Reciever_AccountNumber }}</td>
                 <td>{{ log.Symbol }}{{ log.Amount }}</td>
@@ -131,6 +151,7 @@
         {% if withdrawallogs %}
         <table>
             <tr>
+                <td>Transaction  ID</td>
                 <td>Sort Code</td>
                 <td>Account Number</td>
                 <td>Amount</td>
@@ -140,6 +161,7 @@
             </tr>
             {% for log in withdrawallogs %}
             <tr>
+                <td>{{ log.LogID }}</td>
                 <td>{{ log.Reciever_SortCode }}</td>
                 <td>{{ log.Reciever_AccountNumber }}</td>
                 <td>{{ log.Symbol }}{{ log.Amount }}</td>
