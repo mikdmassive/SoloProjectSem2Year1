@@ -121,6 +121,16 @@ def getAllUnansweredSupportRequests():
         return supreqs
     else:
         return ""
+def getAllUserSupportRequests(email):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM support WHERE Type = 'SupportRequest' AND Email_Ref = '"+email+"';")
+    supreqs = cursor.fetchall()
+    cursor.close()
+    if supreqs:
+        return supreqs
+    else:
+        return ""
     
 def getCurrencyAccFromID(id):
     if id is not None:
@@ -795,9 +805,18 @@ def profile():
                         conn.commit()
                         cursor.close()
                         flash("Support Request Sent!","confirm")
-                     
+                elif getSupportFromID(action):
 
-            return render_template('profile.html',user=user,depositlogs=depositlogs,withdrawallogs=withdrawallogs)
+                    conn = mysql.connector.connect(**db_config)
+                    cursor = conn.cursor()
+                    statement = "DELETE FROM `transsmartdatabase`.`support` WHERE SupportID = %s;"
+                    cursor.execute(
+                        statement,(action,)
+                    )
+                    conn.commit()
+                    cursor.close()
+            supportreqs = getAllUserSupportRequests(user["Email"])
+            return render_template('profile.html',user=user,depositlogs=depositlogs,withdrawallogs=withdrawallogs,supportreqs=supportreqs)
     else:
         return redirect(url_for('home'))
 @app.route('/removebankaccount')

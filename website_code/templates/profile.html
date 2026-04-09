@@ -36,56 +36,85 @@
             <button onclick="location.replace('/currencyaccounts')">View Accounts</button>
         </div>
     </div>
-    <div class="insidesection grayBack">
-        <h2 class="underline">UK Bank Account</h2>
-        {% if user.UKBankAcc_SortCode and user.UKBankAcc_AccountNumber %}
-        <div class="flex right">
-            <div class="flexrow">
-                <p>Sort Code:</p>
-                <p class="roundedbox">{{ user.UKBankAcc_SortCode }}</p>
+    <div class="flex">
+        <div class="insidesection grayBack">
+            <h2 class="underline">UK Bank Account</h2>
+            {% if user.UKBankAcc_SortCode and user.UKBankAcc_AccountNumber %}
+            <div class="flex right">
+                <div class="flexrow">
+                    <p>Sort Code:</p>
+                    <p class="roundedbox">{{ user.UKBankAcc_SortCode }}</p>
+                </div>
+                <div class="flexrow">
+                    <p>Account Number:</p>
+                    <p class="roundedbox">{{ user.UKBankAcc_AccountNumber }}</p>
+                </div>
             </div>
-            <div class="flexrow">
-                <p>Account Number:</p>
-                <p class="roundedbox">{{ user.UKBankAcc_AccountNumber }}</p>
-            </div>
-        </div>
-        <div class="insidesection">
-            <h3>Remove Bank Account</h3>
-            <p>Press below to disconnect the UK Bank Account</p>
-            <button onclick="location.replace('/removebankaccount')">Disconnect</button>
+            <div class="insidesection">
+                <h3>Remove Bank Account</h3>
+                <p>Press below to disconnect the UK Bank Account</p>
+                <button onclick="location.replace('/removebankaccount')">Disconnect</button>
 
-        </div>
-        {% else %}
-        <p>Please enter your sortcode, account number, and password below.</p>
-        <form method="post">
-            <label for="sortcode">Sort Code</label>
-            <input type="text" name="sortcode" id="sortcode"></input>
-            <label for="accountnumber">Account Number</label>
-            <input type="text" name="accountnumber" id="accountnumber"></input>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password"></input><br />
-            {% with messages = get_flashed_messages(with_categories = true) %}
-            {% if messages %}
-            {% for category, msg in messages %}
-            {% if category == "error" %}
-            <div class="flash {{ category }}">
-                {{ msg }}
             </div>
-            {% endif %}
+            {% else %}
+            <p>Please enter your sortcode, account number, and password below.</p>
+            <form method="post">
+                <label for="sortcode">Sort Code</label>
+                <input type="text" name="sortcode" id="sortcode"></input>
+                <label for="accountnumber">Account Number</label>
+                <input type="text" name="accountnumber" id="accountnumber"></input>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password"></input><br />
+                {% with messages = get_flashed_messages(with_categories = true) %}
+                {% if messages %}
+                {% for category, msg in messages %}
+                {% if category == "error" %}
+                <div class="flash {{ category }}">
+                    {{ msg }}
+                </div>
+                {% endif %}
 
-            {% endfor %}
-            <br />
+                {% endfor %}
+                <br />
+                {% endif %}
+                {% endwith %}
+                <button type="submit" name="action" value="Bank">Add</button>
+            </form>
             {% endif %}
-            {% endwith %}
-            <button type="submit" name="action" value="Bank">Add</button>
-        </form>
-        {% endif %}
+        </div>
+        <div class="insidesection grayBack">
+            <h2 class="underline">Your Support Requests</h2>
+            <form class="scrollBar" method="post">
+                {% if supportreqs %}
+                <table>
+                    <tr>
+                        <td>Your Message</td>
+                        <td>Response</td>
+                    </tr>
+                    {% for req in supportreqs %}
+                    <tr>
+                        <td>{{ req.Message }}</td>
+                        {%if req.Response=="Placeholder" %}
+                        <td>No response yet.</td>
+                        {% else %}
+                        
+                        <td>{{ req.Response }}<br/><button type="submit" name="action" value="{{ req.SupportID }}">Close Request</button></td>
+                        {% endif %}
+
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <p>No requests yet.</p>
+                {% endif %}
+            </form>
+        </div>
     </div>
 
 </div>
 <div class="section">
     <div class="insidesection">
-        <h2 class="underline">Support</h2>
+        <h2 class="underline">Request Support</h2>
         <form class="flex" method="post">
             {% with messages = get_flashed_messages(with_categories = true) %}
             {% if messages %}
@@ -151,7 +180,7 @@
         {% if withdrawallogs %}
         <table>
             <tr>
-                <td>Transaction  ID</td>
+                <td>Transaction ID</td>
                 <td>Sort Code</td>
                 <td>Account Number</td>
                 <td>Amount</td>

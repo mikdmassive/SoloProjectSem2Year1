@@ -224,6 +224,17 @@ footer {
 
 }
 
+.scrollBar{
+  display: flex;
+  flex-direction: column;
+  width: 100%!important;
+  max-height: 300px;
+  overflow-y: scroll;
+  border: 2px solid black;
+}
+.scrollBar table tbody tr td{
+  max-width: 300px;
+}
 .insidesection .insidesection h1,
 .insidesection .insidesection h2,
 .insidesection .insidesection h3,
