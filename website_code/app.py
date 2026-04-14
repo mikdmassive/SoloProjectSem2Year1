@@ -153,6 +153,27 @@ def getSuspiciousUsers():
     cursor.close()
     return sususers
 
+def getTransferSymbolsFromID(id):
+    if id is not None:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+
+        statement1 = "SELECT Symbol,c.CurrencyID  FROM log l  JOIN currency_account ca on l.CurrencyAccountID_Sender = ca.CurrencyAccountID JOIN currency c on c.CurrencyID =  ca.CurrencyID WHERE l.LogID = '"+id+"';"
+        cursor.execute(statement1)
+        symbol1 = cursor.fetchone()
+
+        statement2 = "SELECT Symbol,c.CurrencyID  FROM log l  JOIN currency_account ca on l.CurrencyAccountID_Reciever = ca.CurrencyAccountID JOIN currency c on c.CurrencyID =  ca.CurrencyID WHERE l.LogID = '"+id+"';"
+        cursor.execute(statement2)
+        symbol2 = cursor.fetchone()
+        
+        cursor.close()
+        if symbol1 and symbol2:
+            return symbol1["Symbol"],symbol1["CurrencyID"],symbol2["Symbol"],symbol2["CurrencyID"]
+        else:
+            return ""
+    else:
+        return "" 
+
 def getLogFromID(id):
     if id is not None:
         conn = mysql.connector.connect(**db_config)
@@ -392,6 +413,13 @@ def support():
                                         (selectedlog["LogID"],)
                                     )
                                     selectedlog = cursor.fetchone()
+                                elif selectedlog["Type"] =="Transfer":
+                                    symbol1,cID1,symbol2,cID2 = getTransferSymbolsFromID(selectedlog["LogID"])
+                                    selectedlog["Symbol_Sender"] = symbol1
+                                    selectedlog["C_ID_Sender"] = cID1
+                                    selectedlog["Symbol_Reciever"] = symbol2
+                                    selectedlog["C_ID_Reciever"] = cID2
+
                                 conn.close()
                             if action == "SendResponce":
                                 raw_longtext = request.form.get("supportresponce")
@@ -795,7 +823,8 @@ def profile():
                         raw_logid = request.form.get("tref")
                         logid = "null"
                         if getLogFromID(raw_logid):
-                            logid = "\""+raw_logid+"\""
+                            if getCurrencyAccFromID(getLogFromID(raw_logid)["CurrencyAccountID_Sender"])["Email"]  == user["Email"]:
+                                logid = "\""+raw_logid+"\""
                         conn = mysql.connector.connect(**db_config)
                         cursor = conn.cursor()
                         statement = "INSERT IGNORE INTO `transsmartdatabase`.`support`(`SupportID`,`Message`,`Response`,`Complete`,`LogIDRef`,`Email_Ref`,`Type`,`TimeRequested`)VALUES(%s,%s,\"Placeholder\",0,"+logid+",%s,\"SupportRequest\",%s);"
@@ -806,7 +835,7 @@ def profile():
                         cursor.close()
                         flash("Support Request Sent!","confirm")
                 elif getSupportFromID(action):
-
+                    
                     conn = mysql.connector.connect(**db_config)
                     cursor = conn.cursor()
                     statement = "DELETE FROM `transsmartdatabase`.`support` WHERE SupportID = %s;"

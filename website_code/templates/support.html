@@ -63,6 +63,48 @@ endblock %}
                                 <td>{{ selectedlog.AccountName }}</td>
                             </tr>
                         </table>
+                        {% elif selectedlog.Type == "Deposit" %}
+                        <p>This support request references a transaction which was a <b>Deposit</b></p>
+                        <table>
+                            <tr>
+                                <td>Sort Code</td>
+                                <td>Account Number</td>
+                                <td>Amount</td>
+                                <td>Date and Time</td>
+                                <td>Currency Account ID</td>
+                                <td>Currency Account Name</td>
+                            </tr>
+
+                            <tr>
+                                <td>{{ selectedlog.Reciever_SortCode }}</td>
+                                <td>{{ selectedlog.Reciever_AccountNumber }}</td>
+                                <td>{{ selectedlog.Symbol }}{{ selectedlog.Amount }}</td>
+                                <td>{{ selectedlog.TransferDateTime }}</td>
+                                <td>{{ selectedlog.CurrencyAccountID }}</td>
+                                <td>{{ selectedlog.AccountName }}</td>
+                            </tr>
+                        </table>
+                        {% elif selectedlog.Type == "Transfer" %}
+                        <p>This support request references a transaction which was a <b>Currency Account Transfer</b></p>
+                        <table>
+                            <tr>
+                                <td>Sender Currency Account ID</td>
+                                <td>Reciever Currency Account ID</td>
+                                <td>Amount Sent</td>
+                                <td>Amount Recieved</td>
+                                <td>Date and Time</td>
+                            </tr>
+                            <tr>
+                                <td>{{ selectedlog.CurrencyAccountID_Sender }}</td>
+                                <td>{{ selectedlog.CurrencyAccountID_Reciever }}</td>
+                                <td>{{ selectedlog.Symbol_Sender }}{{ selectedlog.Amount }} ({{selectedlog.C_ID_Sender}})</td>
+                                <td>{{ selectedlog.Symbol_Reciever }}{{ selectedlog.Amount2 }} ({{selectedlog.C_ID_Reciever}})</td>
+                                <td>{{ selectedlog.TransferDateTime }}</td>
+
+                            </tr>
+
+                        </table>
+
                         {% endif %}
                     </div>
                     {% endif %}
@@ -86,7 +128,9 @@ endblock %}
                 <tr>
                     <td>Support ID</td>
                     <td>Email</td>
-                    <td>Appeal</td>
+                    <td>Message</td>
+                    <td>Time Requested</td>
+                    
 
                 </tr>
                 {% for supportrequest in supportrequests %}
@@ -97,6 +141,7 @@ endblock %}
 
                     <td>{{ supportrequest.Email_Ref }}</td>
                     <td>{{ supportrequest.Message }}</td>
+                    <td>{{ supportrequest.TimeRequested }}</td>
 
                 </tr>
 

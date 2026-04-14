@@ -228,7 +228,7 @@ footer {
   display: flex;
   flex-direction: column;
   width: 100%!important;
-  max-height: 300px;
+  max-height: 250px;
   overflow-y: scroll;
   border: 2px solid black;
 }
