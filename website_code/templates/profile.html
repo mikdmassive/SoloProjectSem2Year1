@@ -151,6 +151,7 @@
         <h2 class="underline">History</h2>
         <h3 class="underline">Deposits:</h3>
         {% if depositlogs %}
+        <div class="scrollBar">
         <table>
             <tr>
                 <td>Transaction ID</td>
@@ -173,11 +174,13 @@
             </tr>
             {% endfor %}
         </table>
+        </div>
         {% else %}
         <p>No history found.</p>
         {% endif %}
         <h3 class="underline">Withdrawals:</h3>
         {% if withdrawallogs %}
+        <div class="scrollBar">
         <table>
             <tr>
                 <td>Transaction ID</td>
@@ -200,6 +203,8 @@
             </tr>
             {% endfor %}
         </table>
+        </div>
+
         {% else %}
         <p>No history found.</p>
         {% endif %}

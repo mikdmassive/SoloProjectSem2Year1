@@ -178,12 +178,16 @@ footer {
   align-items: center;
   flex-direction: row;
 }
+.FlexRowTop {
+  align-items: flex-start!important;
+}
+
 
 .section {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-around!important;
   align-items: center;
-  flex-direction: column;
+  flex-direction: column!important;
   margin: 20px auto;
   border: none;
   border-bottom: 1px solid rgb(220, 220, 220);
@@ -302,6 +306,7 @@ button {
   text-decoration: none;
   color: #fff;
   font-size: 20px;
+  margin-top: 5px;
 }
 
 button:hover {
@@ -625,7 +630,7 @@ header {
   }
 
   .section {
-    flex-direction: row;
+    flex-direction: row!important;
   }
 
   .reverseDesktopDisplay {

@@ -952,13 +952,14 @@ def currencyaccounts():
         if isUserSuspended(user):
             return redirect(url_for('suspended'))
         else:
-            user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
             currencies = getAllCurrencies()
             logs = None
             selectedCA = None
             currency = None
+            editing = False
             if request.method =="POST":
                 action = request.form.get("action")
+                print(action)
                 if action == "createCA":
                     accname = request.form["accname"]
                     currencyid_raw = request.form["currencyid"]
@@ -973,14 +974,14 @@ def currencyaccounts():
                             )
                             conn.commit()
                             cursor.close()
-                            user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
+                           
                             flash("Currency account created.","confirm")
 
                         else:
                             flash("Account name invalid.","error")
                     else:
                         flash("Currency invalid.","error")
-                elif action == "viewCA":
+                elif action == "viewCA" or action=="startEditing" or action=="editConfirm" or action=="exitEditing":
                     raw_selectedCA = request.form["selectCA"]
                     selectedCA = getCurrencyAccFromID(raw_selectedCA)
                     if selectedCA:
@@ -990,9 +991,25 @@ def currencyaccounts():
                         cursor = conn.cursor(dictionary=True)
                         cursor.execute("SELECT * FROM log WHERE Type = \"Transfer\" AND (CurrencyAccountID_Reciever = %s OR CurrencyAccountID_Sender = %s);",(selectedCA["CurrencyAccountID"],selectedCA["CurrencyAccountID"]))
                         logs = cursor.fetchall()
-                        cursor.close()
+                        ##editing
+                        if action=="startEditing" or action=="editConfirm":
+                            editing = True
+                            if action=="editConfirm":
+                                accnameedit = request.form["accnameedit"]
+                                if currencyaccountNameValidChecker(accnameedit):
+                                    print(accnameedit)
+                                    cursor.execute("UPDATE `transsmartdatabase`.`currency_account` SET `AccountName` = %s WHERE `CurrencyAccountID` = %s;",(accnameedit,selectedCA["CurrencyAccountID"]))
+                                    conn.commit()
 
-            return render_template('currencyaccounts.html',user=user,user_CAs = user_CAs,currencies=currencies,selectedCA = selectedCA,currency=currency,logs = logs)
+                        cursor.close()
+                        ##refresh
+                        selectedCA = getCurrencyAccFromID(raw_selectedCA)
+                        
+                                
+                                
+
+            user_CAs = getAllCurrencyAccountsFromEmail(user["Email"])
+            return render_template('currencyaccounts.html',user=user,user_CAs = user_CAs,currencies=currencies,selectedCA = selectedCA,currency=currency,logs = logs,editing=editing)
     else:
         return redirect(url_for('home'))
 

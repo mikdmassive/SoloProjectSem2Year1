@@ -5,12 +5,11 @@
 {% block title %}TransSmart | Currency Accounts{% endblock %}
 {% block java %}{% endblock %}
 {% block content %}
-<div class="section">
+<form class="section FlexRowTop" method="post">
     <div class="insidesection grayBack">
         <h2 class="underline">Your Currency Accounts</h2>
         {% if user_CAs %}
-        <form method="post">
-
+        <div>
             <select id="selectCA" name="selectCA">
                 <option value="">-- Select an account --</option>
 
@@ -22,32 +21,48 @@
             </select>
             </br>
             <button type="submit" name="action" value="viewCA">Select</button>
-        </form>
-        </br>
-        <div class="insidesection">
-            <h3 class="underline">Currency Account Stats</h3>
-            {% if selectedCA and currency %}
-            <div class="flex right">
 
-                <div class="flexrow">
-                    <p>Account Name:</p>
-                    <p class="roundedbox">{{ selectedCA.AccountName }}</p>
+            </br>
+            {% if selectedCA and currency %}
+
+            <div class="insidesection">
+                <h3 class="underline">Currency Account Stats</h3>
+                {% if editing== True %}
+
+                <label for="accnameedit">Account Name</label>
+                <input type="text" name="accnameedit" id="accnameedit" placeholder="Enter Account Name"></input>
+                <button type="submit" name="action" value="editConfirm">Confirm</button>
+                <button type="submit" name="action" value="exitEditing">Exit Editing</button>
+
+                {% else %}
+                <div class="flex right">
+
+                    <div class="flexrow">
+                        <p>Account Name:</p>
+                        <p class="roundedbox">{{ selectedCA.AccountName }}</p>
+                    </div>
+                    <div class="flexrow">
+                        <p>Account ID:</p>
+                        <p class="roundedbox">{{ selectedCA.CurrencyAccountID }}</p>
+                    </div>
+                    <div class="flexrow">
+                        <p>Currency:</p>
+                        <p class="roundedbox">{{ currency.Currency_Name }}</p>
+                    </div>
+                    <div class="flexrow">
+                        <p>Balance:</p>
+                        <p class="roundedbox">{{ currency.Symbol }}{{ selectedCA.Balance }}</p>
+                    </div>
                 </div>
-                <div class="flexrow">
-                    <p>Account ID:</p>
-                    <p class="roundedbox">{{ selectedCA.CurrencyAccountID }}</p>
-                </div>
-                <div class="flexrow">
-                    <p>Currency:</p>
-                    <p class="roundedbox">{{ currency.Currency_Name }}</p>
-                </div>
-                <div class="flexrow">
-                    <p>Balance:</p>
-                    <p class="roundedbox">{{ currency.Symbol }}{{ selectedCA.Balance }}</p>
-                </div>
+                <button type="submit" name="action" value="startEditing">Edit</button>
+
+                {% endif %}
+
             </div>
+
             <h3 class="underline">Transfer History:</h3>
             {% if logs %}
+            <div class="scrollBar">
             <table>
                 <tr>
                     <td>Transaction ID</td>
@@ -90,6 +105,7 @@
                 </tr>
                 {% endfor %}
             </table>
+            </div>
             {% else %}
             <p>No history found.</p>
             {% endif %}
@@ -97,7 +113,6 @@
             <p>Select one of your currency accounts above</p>
             {% endif %}
         </div>
-
         {% else %}
         <p>You don't have any currency accounts.</p>
         <div class="insidesection">
@@ -115,33 +130,33 @@
 
         {% endif %}
     </div>
+
     <div class="insidesection grayBack">
-        <form method="post">
-            <h2 class="underline">Currency Account Creator</h2>
-            <datalist id="currencies">
-                {% for c in currencies %}
-                <option value="{{ c.CurrencyID }}({{ c.Currency_Name }})"></option>
-                {% endfor %}
-            </datalist>
-            <label for="accname">Account Name</label>
-            <input type="text" name="accname" id="accname" placeholder="Enter Account Name"></input>
-            <label for="refcurrency">Currency</label>
-            <input type="text" name="currencyid" id="currencyid" placeholder="Search Currency"
-                list="currencies"></input>
-            {% with messages = get_flashed_messages(with_categories = true) %}
-            {% if messages %}
-            </br>
-            {% for category, msg in messages %}
-            <div class="flash {{ category }}">
-                {{ msg }}
-            </div>
+
+        <h2 class="underline">Currency Account Creator</h2>
+        <datalist id="currencies">
+            {% for c in currencies %}
+            <option value="{{ c.CurrencyID }}({{ c.Currency_Name }})"></option>
             {% endfor %}
-            {% endif %}
-            {% endwith %}
-            </br>
-            <button type="submit" name="action" value="createCA">Create Account</button>
-        </form>
+        </datalist>
+        <label for="accname">Account Name</label>
+        <input type="text" name="accname" id="accname" placeholder="Enter Account Name"></input>
+        <label for="refcurrency">Currency</label>
+        <input type="text" name="currencyid" id="currencyid" placeholder="Search Currency" list="currencies"></input>
+        {% with messages = get_flashed_messages(with_categories = true) %}
+        {% if messages %}
+        </br>
+        {% for category, msg in messages %}
+        <div class="flash {{ category }}">
+            {{ msg }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        </br>
+        <button type="submit" name="action" value="createCA">Create Account</button>
     </div>
 
-</div>
+
+</form>
 {% endblock %}
